@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fanbom — 画面録画</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161a23;
+      --card:     #1e2330;
+      --border:   #2a3040;
+      --accent:   #5c6ef8;
+      --accent2:  #8b5cf6;
+      --red:      #ef4444;
+      --green:    #22c55e;
+      --yellow:   #f59e0b;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --radius:   12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .logo {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* ── Main card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* ── Toggle group ── */
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .toggle-row:hover { border-color: var(--accent); }
+    .toggle-row.active { border-color: var(--accent); background: rgba(92,110,248,.08); }
+
+    .toggle-info { display: flex; align-items: center; gap: 10px; }
+    .toggle-icon { font-size: 1.3rem; width: 28px; text-align: center; }
+    .toggle-text { line-height: 1.3; }
+    .toggle-text strong { font-size: 0.9rem; }
+    .toggle-text small { display: block; color: var(--muted); font-size: 0.78rem; }
+
+    /* pill toggle */
+    .pill {
+      width: 40px; height: 22px;
+      background: var(--border);
+      border-radius: 99px;
+      position: relative;
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+    .pill::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform .2s;
+    }
+    .toggle-row.active .pill { background: var(--accent); }
+    .toggle-row.active .pill::after { transform: translateX(18px); }
+
+    /* ── Quality select ── */
+    .quality-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .quality-row select {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+    .quality-row select:focus { border-color: var(--accent); }
+
+    /* ── Timer ── */
+    .timer {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 2px;
+      color: var(--text);
+      margin: 8px 0 28px;
+      display: none;
+    }
+    .timer.visible { display: block; }
+    .timer.recording { color: var(--red); }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      flex: 1;
+      justify-content: center;
+    }
+    .btn-danger {
+      background: rgba(239,68,68,.15);
+      color: var(--red);
+      border: 1px solid rgba(239,68,68,.3);
+    }
+    .btn-warn {
+      background: rgba(245,158,11,.12);
+      color: var(--yellow);
+      border: 1px solid rgba(245,158,11,.25);
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .dot.blink {
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── Preview area ── */
+    .preview-wrap {
+      margin-top: 24px;
+      display: none;
+    }
+    .preview-wrap.visible { display: block; }
+
+    .preview-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #000;
+      max-height: 300px;
+    }
+
+    .download-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .download-row input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    .download-row input:focus { border-color: var(--accent); }
+    .btn-download {
+      background: rgba(34,197,94,.12);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,.3);
+      white-space: nowrap;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+    }
+    .status-dot.green { background: var(--green); }
+    .status-dot.red   { background: var(--red); animation: blink 1s step-start infinite; }
+    .status-dot.yellow{ background: var(--yellow); }
+
+    footer {
+      margin-top: 32px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">fanbom</div>
+  <p class="tagline">シンプルな画面録画ツール</p>
+</header>
+
+<div class="card">
+
+  <!-- Audio options -->
+  <p class="section-label">音声設定</p>
+  <div class="toggle-group">
+    <div class="toggle-row active" id="toggle-mic" onclick="toggle(this)">
+      <div class="toggle-info">
+        <span class="toggle-icon">🎙️</span>
+        <div class="toggle-text">
+          <strong>マイク音声</strong>
+          <small>マイクからの音声を録音する</small>
+        </div>
+      </div>
+      <div class="pill"></div>
+    </div>
+
+    <div class="toggle-row" id="toggle-sys" onclick="toggle(this)">
+      <div class="toggle-info">
+        <span class="toggle-icon">🔊</span>
+        <div class="toggle-text">
+          <strong>システム音声</strong>
+          <small>画面共有時の音声を録音する（ブラウザ対応時）</small>
+        </div>
+      </div>
+      <div class="pill"></div>
+    </div>
+
+    <div class="toggle-row" id="toggle-noaudio" onclick="toggleExclusive(this)">
+      <div class="toggle-info">
+        <span class="toggle-icon">🔇</span>
+        <div class="toggle-text">
+          <strong>音声なし</strong>
+          <small>映像のみ録画する</small>
+        </div>
+      </div>
+      <div class="pill"></div>
+    </div>
+  </div>
+
+  <!-- Quality -->
+  <p class="section-label">画質設定</p>
+  <div class="quality-row">
+    <select id="quality">
+      <option value="1080">フルHD (1080p)</option>
+      <option value="720" selected>HD (720p)</option>
+      <option value="480">SD (480p)</option>
+      <option value="0">元の解像度を維持</option>
+    </select>
+  </div>
+
+  <!-- Timer -->
+  <div class="timer" id="timer">00:00:00</div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-primary" id="btn-start" onclick="startRecording()">
+      <span class="dot"></span> 録画開始
+    </button>
+    <button class="btn btn-warn" id="btn-pause" onclick="togglePause()" disabled>
+      ⏸ 一時停止
+    </button>
+    <button class="btn btn-danger" id="btn-stop" onclick="stopRecording()" disabled>
+      ⏹ 停止
+    </button>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-wrap" id="preview-wrap">
+    <p class="preview-label">録画プレビュー</p>
+    <video id="preview" controls></video>
+    <div class="download-row">
+      <input type="text" id="filename" placeholder="ファイル名（拡張子なし）" value="fanbom-recording" />
+      <button class="btn btn-download btn-primary" onclick="downloadRecording()">⬇ 保存</button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">録画を開始するには「録画開始」を押してください</span>
+  </div>
+
+</div>
+
+<footer>fanbom v1.0 &nbsp;—&nbsp; 録画データはブラウザ内に保存されます</footer>
+
+<script>
+  let mediaRecorder = null;
+  let chunks = [];
+  let timerInterval = null;
+  let seconds = 0;
+  let isPaused = false;
+  let recordedBlob = null;
+  let displayStream = null;
+  let micStream = null;
+  let combinedStream = null;
+
+  // ── Toggle helpers ──────────────────────────────────────────────
+  function toggle(el) {
+    // "音声なし" が ON なら他のトグルは無効化する逆方向
+    if (document.getElementById('toggle-noaudio').classList.contains('active')) return;
+    el.classList.toggle('active');
+  }
+
+  function toggleExclusive(el) {
+    const noAudio = document.getElementById('toggle-noaudio');
+    const mic     = document.getElementById('toggle-mic');
+    const sys     = document.getElementById('toggle-sys');
+    if (!noAudio.classList.contains('active')) {
+      noAudio.classList.add('active');
+      mic.classList.remove('active');
+      sys.classList.remove('active');
+    } else {
+      noAudio.classList.remove('active');
+    }
+  }
+
+  // ── Timer ──────────────────────────────────────────────────────
+  function startTimer() {
+    seconds = 0;
+    const el = document.getElementById('timer');
+    el.classList.add('visible', 'recording');
+    timerInterval = setInterval(() => {
+      if (!isPaused) seconds++;
+      const h = String(Math.floor(seconds / 3600)).padStart(2,'0');
+      const m = String(Math.floor((seconds % 3600) / 60)).padStart(2,'0');
+      const s = String(seconds % 60).padStart(2,'0');
+      el.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    const el = document.getElementById('timer');
+    el.classList.remove('recording');
+  }
+
+  // ── Status ─────────────────────────────────────────────────────
+  function setStatus(msg, state='idle') {
+    const dot  = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    dot.className = 'status-dot';
+    if (state === 'recording') dot.classList.add('red');
+    else if (state === 'ready')  dot.classList.add('green');
+    else if (state === 'paused') dot.classList.add('yellow');
+    text.textContent = msg;
+  }
+
+  // ── Start ──────────────────────────────────────────────────────
+  async function startRecording() {
+    chunks = [];
+    recordedBlob = null;
+    document.getElementById('preview-wrap').classList.remove('visible');
+
+    const noAudio  = document.getElementById('toggle-noaudio').classList.contains('active');
+    const useMic   = document.getElementById('toggle-mic').classList.contains('active');
+    const useSys   = document.getElementById('toggle-sys').classList.contains('active');
+    const quality  = document.getElementById('quality').value;
+
+    try {
+      // Screen capture
+      const displayOpts = {
+        video: quality === '0' ? true : { height: { ideal: parseInt(quality) } },
+        audio: useSys,   // システム音声（対応ブラウザのみ）
+        selfBrowserSurface: 'include',
+      };
+      displayStream = await navigator.mediaDevices.getDisplayMedia(displayOpts);
+
+      const tracks = [...displayStream.getTracks()];
+
+      // Mic
+      if (!noAudio && useMic) {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          micStream.getAudioTracks().forEach(t => tracks.push(t));
+        } catch(e) {
+          setStatus('マイクのアクセスが拒否されました。映像のみ録画します。', 'recording');
+        }
+      }
+
+      combinedStream = new MediaStream(tracks);
+
+      // Choose codec
+      const mimeType = getSupportedMime();
+      const options  = mimeType ? { mimeType } : {};
+      mediaRecorder  = new MediaRecorder(combinedStream, options);
+
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      mediaRecorder.onstop = finalize;
+
+      // Stop if user closes the share dialog
+      displayStream.getVideoTracks()[0].onended = () => stopRecording();
+
+      mediaRecorder.start(500);
+      isPaused = false;
+
+      document.getElementById('btn-start').disabled = true;
+      document.getElementById('btn-pause').disabled = false;
+      document.getElementById('btn-stop').disabled  = false;
+      startTimer();
+      setStatus('録画中...', 'recording');
+      document.getElementById('btn-start').querySelector('.dot').classList.add('blink');
+
+    } catch (err) {
+      console.error(err);
+      if (err.name === 'NotAllowedError') {
+        setStatus('画面共有がキャンセルされました。', 'idle');
+      } else {
+        setStatus(`エラー: ${err.message}`, 'idle');
+      }
+    }
+  }
+
+  // ── Pause / Resume ─────────────────────────────────────────────
+  function togglePause() {
+    if (!mediaRecorder) return;
+    const btn = document.getElementById('btn-pause');
+    if (!isPaused) {
+      mediaRecorder.pause();
+      isPaused = true;
+      btn.textContent = '▶ 再開';
+      setStatus('一時停止中', 'paused');
+    } else {
+      mediaRecorder.resume();
+      isPaused = false;
+      btn.textContent = '⏸ 一時停止';
+      setStatus('録画中...', 'recording');
+    }
+  }
+
+  // ── Stop ───────────────────────────────────────────────────────
+  function stopRecording() {
+    if (!mediaRecorder) return;
+    mediaRecorder.stop();
+    combinedStream?.getTracks().forEach(t => t.stop());
+    micStream?.getTracks().forEach(t => t.stop());
+    stopTimer();
+
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-pause').disabled = true;
+    document.getElementById('btn-stop').disabled  = true;
+    document.getElementById('btn-pause').textContent = '⏸ 一時停止';
+    document.getElementById('btn-start').querySelector('.dot').classList.remove('blink');
+    setStatus('処理中...', 'idle');
+  }
+
+  // ── Finalize ───────────────────────────────────────────────────
+  function finalize() {
+    const mime = mediaRecorder?.mimeType || 'video/webm';
+    recordedBlob = new Blob(chunks, { type: mime });
+    const url  = URL.createObjectURL(recordedBlob);
+    const vid  = document.getElementById('preview');
+    vid.src    = url;
+
+    document.getElementById('preview-wrap').classList.add('visible');
+    setStatus(`録画完了 — ${formatBytes(recordedBlob.size)}`, 'ready');
+  }
+
+  // ── Download ───────────────────────────────────────────────────
+  function downloadRecording() {
+    if (!recordedBlob) return;
+    const name = document.getElementById('filename').value.trim() || 'fanbom-recording';
+    const ext  = getExt(recordedBlob.type);
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(recordedBlob);
+    a.download = `${name}.${ext}`;
+    a.click();
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function getSupportedMime() {
+    const candidates = [
+      'video/mp4;codecs=h264,aac',
+      'video/mp4',
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+    ];
+    return candidates.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  }
+
+  function getExt(mime) {
+    if (mime.includes('mp4'))  return 'mp4';
+    if (mime.includes('ogg'))  return 'ogg';
+    return 'webm';
+  }
+
+  function formatBytes(b) {
+    if (b < 1024)        return b + ' B';
+    if (b < 1024**2)     return (b/1024).toFixed(1) + ' KB';
+    if (b < 1024**3)     return (b/1024**2).toFixed(1) + ' MB';
+    return (b/1024**3).toFixed(2) + ' GB';
+  }
+</script>
+</body>
+</html>
