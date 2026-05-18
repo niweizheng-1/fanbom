@@ -2,10 +2,10 @@
 
 シンプルなブラウザ画面録画ツール。インストール不要、サーバー不要、完全クライアントサイド。
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://niweizheng-1.github.io/fanbom/)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://fanbom.online/)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-**[▶ ライブデモ: https://niweizheng-1.github.io/fanbom/](https://niweizheng-1.github.io/fanbom/)**
+**[▶ ライブデモ: https://fanbom.online/](https://fanbom.online/)**
 
 ---
 
