@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src blob: data:;" />
   <title>fanbom — 画面録画</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0d0f14;
-      --surface:  #161a23;
-      --card:     #1e2330;
-      --border:   #2a3040;
-      --accent:   #5c6ef8;
-      --accent2:  #8b5cf6;
-      --red:      #ef4444;
-      --green:    #22c55e;
-      --yellow:   #f59e0b;
-      --text:     #e2e8f0;
-      --muted:    #64748b;
-      --radius:   12px;
+      --bg:      #0d0f14;
+      --surface: #161a23;
+      --card:    #1e2330;
+      --border:  #2a3040;
+      --accent:  #5c6ef8;
+      --accent2: #8b5cf6;
+      --red:     #ef4444;
+      --green:   #22c55e;
+      --yellow:  #f59e0b;
+      --text:    #e2e8f0;
+      --muted:   #64748b;
+      --r:       12px;
     }
 
     body {
@@ -30,333 +32,374 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 16px;
+      padding: 32px 16px 48px;
     }
+
+    /* ── Disclaimer modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 16px;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px;
+      max-width: 520px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal h2 { font-size: 1.25rem; margin-bottom: 6px; }
+    .modal .modal-sub { color: var(--muted); font-size: 0.83rem; margin-bottom: 20px; }
+    .modal-section { margin-bottom: 18px; }
+    .modal-section h3 {
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--accent); margin-bottom: 6px;
+    }
+    .modal-section p { font-size: 0.88rem; line-height: 1.65; color: #c4ccd8; }
+    .modal-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    .modal-check {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.85rem; color: var(--text); cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .modal-check input { margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+    .btn-agree {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      opacity: .4; transition: opacity .2s;
+    }
+    .btn-agree.ready { opacity: 1; }
 
     /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+    header { text-align: center; margin-bottom: 36px; }
     .logo {
-      font-size: 2.6rem;
-      font-weight: 800;
-      letter-spacing: -1px;
+      font-size: 2.6rem; font-weight: 800; letter-spacing: -1px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .tagline {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 4px;
-    }
+    .tagline { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
 
-    /* ── Main card ── */
+    /* ── Notice banner ── */
+    .notice {
+      width: 100%; max-width: 640px;
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.82rem; display: flex; align-items: flex-start; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .notice.yellow { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); color: #fbbf24; }
+    .notice.blue   { background: rgba(92,110,248,.08); border: 1px solid rgba(92,110,248,.25); color: #818cf8; }
+    .notice-icon { flex-shrink: 0; font-size: 1rem; line-height: 1.4; }
+    .notice p { line-height: 1.5; }
+    .notice a { color: inherit; }
+
+    /* ── Card ── */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--r);
       padding: 28px;
-      width: 100%;
-      max-width: 640px;
+      width: 100%; max-width: 640px;
     }
 
-    /* ── Section label ── */
     .section-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 10px;
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--muted); margin-bottom: 10px;
     }
 
     /* ── Toggle group ── */
-    .toggle-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
+    .toggle-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
     .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: border-color .15s;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 16px;
+      cursor: pointer; transition: border-color .15s;
     }
     .toggle-row:hover { border-color: var(--accent); }
     .toggle-row.active { border-color: var(--accent); background: rgba(92,110,248,.08); }
-
+    .toggle-row.disabled { opacity: .4; pointer-events: none; }
     .toggle-info { display: flex; align-items: center; gap: 10px; }
     .toggle-icon { font-size: 1.3rem; width: 28px; text-align: center; }
-    .toggle-text { line-height: 1.3; }
     .toggle-text strong { font-size: 0.9rem; }
-    .toggle-text small { display: block; color: var(--muted); font-size: 0.78rem; }
-
-    /* pill toggle */
+    .toggle-text small { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
     .pill {
-      width: 40px; height: 22px;
-      background: var(--border);
-      border-radius: 99px;
-      position: relative;
-      flex-shrink: 0;
-      transition: background .2s;
+      width: 40px; height: 22px; background: var(--border);
+      border-radius: 99px; position: relative; flex-shrink: 0; transition: background .2s;
     }
     .pill::after {
-      content: '';
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: #fff;
-      transition: transform .2s;
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
     }
     .toggle-row.active .pill { background: var(--accent); }
     .toggle-row.active .pill::after { transform: translateX(18px); }
 
-    /* ── Quality select ── */
-    .quality-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
+    /* ── Quality ── */
+    .quality-row { display: flex; gap: 10px; margin-bottom: 24px; }
     .quality-row select {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 0.88rem;
-      cursor: pointer;
-      outline: none;
-      appearance: none;
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 10px 36px 10px 14px;
+      font-size: 0.88rem; cursor: pointer; outline: none; appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 36px;
+      background-repeat: no-repeat; background-position: right 14px center;
     }
     .quality-row select:focus { border-color: var(--accent); }
 
+    /* ── Format badge ── */
+    .format-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0 10px; font-size: 0.76rem; color: var(--muted);
+      white-space: nowrap; flex-shrink: 0; height: 42px;
+    }
+
     /* ── Timer ── */
     .timer {
-      text-align: center;
-      font-size: 3rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 2px;
-      color: var(--text);
-      margin: 8px 0 28px;
-      display: none;
+      text-align: center; font-size: 3rem; font-weight: 700;
+      font-variant-numeric: tabular-nums; letter-spacing: 2px;
+      margin: 8px 0 28px; display: none;
     }
     .timer.visible { display: block; }
     .timer.recording { color: var(--red); }
 
     /* ── Controls ── */
-    .controls {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-
+    .controls { display: flex; gap: 10px; }
     .btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 18px; border: none; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
       transition: opacity .15s, transform .1s;
     }
     .btn:active { transform: scale(.97); }
     .btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      flex: 1;
-      justify-content: center;
-    }
-    .btn-danger {
-      background: rgba(239,68,68,.15);
-      color: var(--red);
-      border: 1px solid rgba(239,68,68,.3);
-    }
-    .btn-warn {
-      background: rgba(245,158,11,.12);
-      color: var(--yellow);
-      border: 1px solid rgba(245,158,11,.25);
-    }
-
-    .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-    .dot.blink {
-      animation: blink 1s step-start infinite;
-    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; flex: 1; }
+    .btn-danger  { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+    .btn-warn    { background: rgba(245,158,11,.12); color: var(--yellow); border: 1px solid rgba(245,158,11,.25); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+    .dot.blink { animation: blink 1s step-start infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* ── Preview area ── */
-    .preview-wrap {
-      margin-top: 24px;
-      display: none;
+    /* ── Audio warn ── */
+    .audio-warn {
+      margin-top: 14px; padding: 10px 14px;
+      background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2);
+      border-radius: 8px; font-size: 0.8rem; color: #fbbf24;
+      display: none; line-height: 1.5;
     }
+    .audio-warn.visible { display: block; }
+
+    /* ── Preview ── */
+    .preview-wrap { margin-top: 24px; display: none; }
     .preview-wrap.visible { display: block; }
-
     .preview-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-bottom: 8px;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted); margin-bottom: 8px;
     }
-
     video {
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #000;
-      max-height: 300px;
+      width: 100%; border-radius: 8px; border: 1px solid var(--border);
+      background: #000; max-height: 300px;
     }
-
-    .download-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-    }
+    .download-row { display: flex; gap: 10px; margin-top: 12px; }
     .download-row input {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 9px 14px;
-      font-size: 0.88rem;
-      outline: none;
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 9px 14px;
+      font-size: 0.88rem; outline: none;
     }
     .download-row input:focus { border-color: var(--accent); }
     .btn-download {
-      background: rgba(34,197,94,.12);
-      color: var(--green);
-      border: 1px solid rgba(34,197,94,.3);
-      white-space: nowrap;
+      background: rgba(34,197,94,.12); color: var(--green);
+      border: 1px solid rgba(34,197,94,.3); white-space: nowrap;
+    }
+    .format-hint {
+      margin-top: 8px; font-size: 0.78rem; color: var(--muted); line-height: 1.5;
     }
 
-    /* ── Status bar ── */
+    /* ── Status ── */
     .status-bar {
-      margin-top: 16px;
-      padding: 10px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin-top: 16px; padding: 10px 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 0.82rem; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
     }
-    .status-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--muted);
-      flex-shrink: 0;
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+    .status-dot.green  { background: var(--green); }
+    .status-dot.red    { background: var(--red); animation: blink 1s step-start infinite; }
+    .status-dot.yellow { background: var(--yellow); }
+
+    /* ── Privacy section ── */
+    .privacy-card {
+      margin-top: 12px; width: 100%; max-width: 640px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 20px 24px;
     }
-    .status-dot.green { background: var(--green); }
-    .status-dot.red   { background: var(--red); animation: blink 1s step-start infinite; }
-    .status-dot.yellow{ background: var(--yellow); }
+    .privacy-card h3 {
+      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted); margin-bottom: 12px;
+    }
+    .privacy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 480px) { .privacy-grid { grid-template-columns: 1fr; } }
+    .privacy-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .privacy-item .pi-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 2px; }
+    .privacy-item .pi-value { font-size: 0.83rem; color: var(--text); }
+    .pi-value.good { color: var(--green); }
+    .pi-value.warn { color: var(--yellow); }
 
     footer {
-      margin-top: 32px;
-      color: var(--muted);
-      font-size: 0.78rem;
+      margin-top: 24px; color: var(--muted); font-size: 0.76rem;
+      text-align: center; line-height: 1.8;
     }
+    footer a { color: var(--muted); }
   </style>
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════
+     DISCLAIMER MODAL (shown once on first visit)
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title">fanbom をご利用の前に</h2>
+    <p class="modal-sub">以下の内容をお読みいただき、同意の上でご利用ください。</p>
+
+    <div class="modal-section">
+      <h3>プライバシーについて</h3>
+      <p>fanbom はすべての処理をブラウザ内で完結します。録画データはサーバーへ送信されず、外部に一切共有されません。録画はブラウザのメモリ（RAM）にのみ保存され、タブを閉じると消去されます。</p>
+    </div>
+
+    <div class="modal-section">
+      <h3>免責事項</h3>
+      <p>本ツールの使用は自己責任で行ってください。開発者は録画内容・使用目的・第三者への影響に対して一切の責任を負いません。</p>
+    </div>
+
+    <div class="modal-section">
+      <h3>録画に関する法律</h3>
+      <p>第三者の映像・音声・画面を録画する行為は、国・地域によって法的規制の対象となる場合があります。本ツールを使用する前に、お住まいの地域の法令（録音・盗撮禁止法、個人情報保護法等）を確認し、必要な同意を取得した上でご利用ください。同意のない録画は法律に違反する可能性があります。</p>
+    </div>
+
+    <div class="modal-section">
+      <h3>ブラウザ制限について</h3>
+      <p>本ツールは Web API（getDisplayMedia / MediaRecorder）を使用しています。システム音声のキャプチャは Chrome のみ対応で、macOS では OS の制限により取得できない場合があります。録画ファイルは WebM 形式で保存されます（VLC、Chrome、Firefox で再生可能）。</p>
+    </div>
+
+    <hr class="modal-divider" />
+
+    <label class="modal-check">
+      <input type="checkbox" id="agree-check" onchange="onAgreeChange()" />
+      上記の内容を読み、理解した上で同意します。
+    </label>
+
+    <button class="btn-agree" id="btn-agree" disabled onclick="acceptDisclaimer()">
+      同意して使用する
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════════════ -->
 <header>
   <div class="logo">fanbom</div>
-  <p class="tagline">シンプルな画面録画ツール</p>
+  <p class="tagline">シンプルなブラウザ画面録画ツール</p>
 </header>
+
+<!-- Storage warning -->
+<div class="notice yellow">
+  <span class="notice-icon">&#9888;</span>
+  <p>録画はブラウザのメモリに一時保存されます。<strong>タブを閉じる前に必ず「保存」してください。</strong>閉じると録画データは消えます。</p>
+</div>
+
+<!-- HTTPS notice (shown only on non-secure contexts) -->
+<div class="notice blue" id="https-notice" style="display:none">
+  <span class="notice-icon">&#8505;</span>
+  <p>画面録画には <strong>HTTPS</strong> または <strong>localhost</strong> が必要です。このページは HTTP で開かれているため録画できない場合があります。</p>
+</div>
 
 <div class="card">
 
-  <!-- Audio options -->
+  <!-- Audio settings -->
   <p class="section-label">音声設定</p>
   <div class="toggle-group">
-    <div class="toggle-row active" id="toggle-mic" onclick="toggle(this)">
+
+    <div class="toggle-row active" id="toggle-mic" role="checkbox" aria-checked="true"
+         tabindex="0" onclick="toggleMicSys(this)" onkeydown="keyToggle(event,this)">
       <div class="toggle-info">
-        <span class="toggle-icon">🎙️</span>
+        <span class="toggle-icon" aria-hidden="true">&#127897;</span>
         <div class="toggle-text">
           <strong>マイク音声</strong>
           <small>マイクからの音声を録音する</small>
         </div>
       </div>
-      <div class="pill"></div>
+      <div class="pill" aria-hidden="true"></div>
     </div>
 
-    <div class="toggle-row" id="toggle-sys" onclick="toggle(this)">
+    <div class="toggle-row" id="toggle-sys" role="checkbox" aria-checked="false"
+         tabindex="0" onclick="toggleMicSys(this)" onkeydown="keyToggle(event,this)">
       <div class="toggle-info">
-        <span class="toggle-icon">🔊</span>
+        <span class="toggle-icon" aria-hidden="true">&#128266;</span>
         <div class="toggle-text">
           <strong>システム音声</strong>
-          <small>画面共有時の音声を録音する（ブラウザ対応時）</small>
+          <small>Chrome のみ対応 / 画面共有ダイアログで「音声を共有」にチェックが必要</small>
         </div>
       </div>
-      <div class="pill"></div>
+      <div class="pill" aria-hidden="true"></div>
     </div>
 
-    <div class="toggle-row" id="toggle-noaudio" onclick="toggleExclusive(this)">
+    <div class="toggle-row" id="toggle-noaudio" role="checkbox" aria-checked="false"
+         tabindex="0" onclick="toggleNoAudio()" onkeydown="keyToggle(event,this)">
       <div class="toggle-info">
-        <span class="toggle-icon">🔇</span>
+        <span class="toggle-icon" aria-hidden="true">&#128263;</span>
         <div class="toggle-text">
           <strong>音声なし</strong>
           <small>映像のみ録画する</small>
         </div>
       </div>
-      <div class="pill"></div>
+      <div class="pill" aria-hidden="true"></div>
     </div>
+
+  </div>
+
+  <!-- Audio warning box -->
+  <div class="audio-warn" id="audio-warn">
+    <strong>システム音声について：</strong><br>
+    Chrome のみ対応。画面共有ダイアログで必ず「タブの音声を共有」または「音声を共有」にチェックしてください。macOS ではOS制限により取得できません。マイクと同時使用する場合は自動でミキシングされます。
   </div>
 
   <!-- Quality -->
-  <p class="section-label">画質設定</p>
+  <p class="section-label" style="margin-top:20px">画質・形式</p>
   <div class="quality-row">
-    <select id="quality">
+    <select id="quality" aria-label="画質設定">
       <option value="1080">フルHD (1080p)</option>
       <option value="720" selected>HD (720p)</option>
       <option value="480">SD (480p)</option>
       <option value="0">元の解像度を維持</option>
     </select>
+    <div class="format-badge" id="format-badge">&#127358; WebM</div>
   </div>
 
   <!-- Timer -->
-  <div class="timer" id="timer">00:00:00</div>
+  <div class="timer" id="timer" aria-live="polite">00:00:00</div>
 
   <!-- Controls -->
   <div class="controls">
     <button class="btn btn-primary" id="btn-start" onclick="startRecording()">
-      <span class="dot"></span> 録画開始
+      <span class="dot" aria-hidden="true"></span> 録画開始
     </button>
-    <button class="btn btn-warn" id="btn-pause" onclick="togglePause()" disabled>
-      ⏸ 一時停止
+    <button class="btn btn-warn" id="btn-pause" onclick="togglePause()" disabled aria-label="一時停止">
+      &#9208; 一時停止
     </button>
-    <button class="btn btn-danger" id="btn-stop" onclick="stopRecording()" disabled>
-      ⏹ 停止
+    <button class="btn btn-danger" id="btn-stop" onclick="stopRecording()" disabled aria-label="録画停止">
+      &#9209; 停止
     </button>
   </div>
 
@@ -365,53 +408,164 @@
     <p class="preview-label">録画プレビュー</p>
     <video id="preview" controls></video>
     <div class="download-row">
-      <input type="text" id="filename" placeholder="ファイル名（拡張子なし）" value="fanbom-recording" />
-      <button class="btn btn-download btn-primary" onclick="downloadRecording()">⬇ 保存</button>
+      <input type="text" id="filename" placeholder="ファイル名（拡張子なし）"
+             value="fanbom-recording" maxlength="100" aria-label="保存ファイル名" />
+      <button class="btn btn-download" onclick="downloadRecording()">&#11015; 保存</button>
     </div>
+    <p class="format-hint" id="format-hint"></p>
   </div>
 
-  <!-- Status -->
-  <div class="status-bar">
+  <!-- Status bar -->
+  <div class="status-bar" role="status" aria-live="polite">
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">録画を開始するには「録画開始」を押してください</span>
   </div>
 
 </div>
 
-<footer>fanbom v1.0 &nbsp;—&nbsp; 録画データはブラウザ内に保存されます</footer>
+<!-- Privacy summary card -->
+<div class="privacy-card">
+  <h3>データとプライバシー</h3>
+  <div class="privacy-grid">
+    <div class="privacy-item">
+      <div class="pi-label">サーバー送信</div>
+      <div class="pi-value good">なし（完全クライアント処理）</div>
+    </div>
+    <div class="privacy-item">
+      <div class="pi-label">データ保存場所</div>
+      <div class="pi-value warn">ブラウザのメモリ（RAM）のみ</div>
+    </div>
+    <div class="privacy-item">
+      <div class="pi-label">トラッキング</div>
+      <div class="pi-value good">なし</div>
+    </div>
+    <div class="privacy-item">
+      <div class="pi-label">外部リソース</div>
+      <div class="pi-value good">なし（完全オフライン動作）</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  fanbom v1.1 &nbsp;&mdash;&nbsp;
+  <a href="https://github.com/niweizheng-1/fanbom" target="_blank" rel="noopener">GitHub</a>
+  &nbsp;&mdash;&nbsp;
+  MIT License &nbsp;&mdash;&nbsp;
+  <span onclick="reopenDisclaimer()" style="cursor:pointer;text-decoration:underline">免責事項を確認</span>
+</footer>
 
 <script>
-  let mediaRecorder = null;
-  let chunks = [];
-  let timerInterval = null;
-  let seconds = 0;
-  let isPaused = false;
-  let recordedBlob = null;
-  let displayStream = null;
-  let micStream = null;
-  let combinedStream = null;
+  // ── State ─────────────────────────────────────────────────────────────────
+  let mediaRecorder  = null;
+  let chunks         = [];
+  let timerInterval  = null;
+  let seconds        = 0;
+  let isPaused       = false;
+  let recordedBlob   = null;
+  let hasDownloaded  = false;
+  let displayStream  = null;
+  let micStream      = null;
+  let audioCtx       = null;
+  let activeMimeType = '';
 
-  // ── Toggle helpers ──────────────────────────────────────────────
-  function toggle(el) {
-    // "音声なし" が ON なら他のトグルは無効化する逆方向
-    if (document.getElementById('toggle-noaudio').classList.contains('active')) return;
-    el.classList.toggle('active');
+  // ── Security: filename sanitization ──────────────────────────────────────
+  function sanitizeFilename(name) {
+    return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').replace(/\.+$/, '').trim()
+      || 'fanbom-recording';
   }
 
-  function toggleExclusive(el) {
+  // ── HTTPS check ──────────────────────────────────────────────────────────
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    document.getElementById('https-notice').style.display = 'flex';
+  }
+
+  // ── Disclaimer ───────────────────────────────────────────────────────────
+  function onAgreeChange() {
+    const checked = document.getElementById('agree-check').checked;
+    const btn     = document.getElementById('btn-agree');
+    btn.disabled  = !checked;
+    btn.classList.toggle('ready', checked);
+  }
+
+  function acceptDisclaimer() {
+    if (!document.getElementById('agree-check').checked) return;
+    localStorage.setItem('fanbom_agreed', '1');
+    document.getElementById('modal-backdrop').classList.add('hidden');
+  }
+
+  function reopenDisclaimer() {
+    document.getElementById('modal-backdrop').classList.remove('hidden');
+  }
+
+  if (localStorage.getItem('fanbom_agreed') === '1') {
+    document.getElementById('modal-backdrop').classList.add('hidden');
+  }
+
+  // ── Detect supported MIME type ────────────────────────────────────────────
+  function getSupportedMime() {
+    const candidates = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+      'video/mp4;codecs=h264,aac',
+      'video/mp4',
+    ];
+    return candidates.find(m => {
+      try { return MediaRecorder.isTypeSupported(m); } catch { return false; }
+    }) || '';
+  }
+
+  function getExt(mime) {
+    if (mime.includes('mp4')) return 'mp4';
+    if (mime.includes('ogg')) return 'ogg';
+    return 'webm';
+  }
+
+  // Update format badge on load
+  (function updateFormatBadge() {
+    const mime = getSupportedMime();
+    const ext  = getExt(mime).toUpperCase();
+    document.getElementById('format-badge').textContent = '🇾 ' + ext;
+    activeMimeType = mime;
+  })();
+
+  // ── Toggle helpers ────────────────────────────────────────────────────────
+  function toggleMicSys(el) {
+    if (document.getElementById('toggle-noaudio').classList.contains('active')) return;
+    const isActive = el.classList.toggle('active');
+    el.setAttribute('aria-checked', isActive);
+    updateAudioWarn();
+  }
+
+  function toggleNoAudio() {
     const noAudio = document.getElementById('toggle-noaudio');
     const mic     = document.getElementById('toggle-mic');
     const sys     = document.getElementById('toggle-sys');
-    if (!noAudio.classList.contains('active')) {
-      noAudio.classList.add('active');
-      mic.classList.remove('active');
-      sys.classList.remove('active');
+    const turning = !noAudio.classList.contains('active');
+    noAudio.classList.toggle('active', turning);
+    noAudio.setAttribute('aria-checked', turning);
+    if (turning) {
+      mic.classList.remove('active'); mic.setAttribute('aria-checked', 'false');
+      sys.classList.remove('active'); sys.setAttribute('aria-checked', 'false');
+      mic.classList.add('disabled');
+      sys.classList.add('disabled');
     } else {
-      noAudio.classList.remove('active');
+      mic.classList.remove('disabled');
+      sys.classList.remove('disabled');
     }
+    updateAudioWarn();
   }
 
-  // ── Timer ──────────────────────────────────────────────────────
+  function updateAudioWarn() {
+    const sysOn = document.getElementById('toggle-sys').classList.contains('active');
+    document.getElementById('audio-warn').classList.toggle('visible', sysOn);
+  }
+
+  function keyToggle(e, el) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); el.click(); }
+  }
+
+  // ── Timer ─────────────────────────────────────────────────────────────────
   function startTimer() {
     seconds = 0;
     const el = document.getElementById('timer');
@@ -427,65 +581,98 @@
 
   function stopTimer() {
     clearInterval(timerInterval);
-    const el = document.getElementById('timer');
-    el.classList.remove('recording');
+    document.getElementById('timer').classList.remove('recording');
   }
 
-  // ── Status ─────────────────────────────────────────────────────
-  function setStatus(msg, state='idle') {
-    const dot  = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
+  // ── Status ────────────────────────────────────────────────────────────────
+  function setStatus(msg, state = 'idle') {
+    const dot = document.getElementById('status-dot');
     dot.className = 'status-dot';
     if (state === 'recording') dot.classList.add('red');
     else if (state === 'ready')  dot.classList.add('green');
     else if (state === 'paused') dot.classList.add('yellow');
-    text.textContent = msg;
+    document.getElementById('status-text').textContent = msg;
   }
 
-  // ── Start ──────────────────────────────────────────────────────
+  // ── Audio mixing (AudioContext) ────────────────────────────────────────────
+  // Fixes: multiple audio tracks in new MediaStream() are NOT mixed —
+  // only the first track is recorded. AudioContext properly mixes them.
+  async function buildAudioTrack(displayStr, micStr, useSys, useMic) {
+    const hasSys = useSys && displayStr.getAudioTracks().length > 0;
+    const hasMic = useMic && micStr && micStr.getAudioTracks().length > 0;
+
+    if (!hasSys && !hasMic) return null;
+    if (hasSys && !hasMic)  return new MediaStream(displayStr.getAudioTracks());
+    if (!hasSys && hasMic)  return micStr;
+
+    // Both: mix via AudioContext
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const dest = audioCtx.createMediaStreamDestination();
+
+    const sysSource = audioCtx.createMediaStreamSource(new MediaStream(displayStr.getAudioTracks()));
+    sysSource.connect(dest);
+
+    const micSource = audioCtx.createMediaStreamSource(micStr);
+    micSource.connect(dest);
+
+    return dest.stream;
+  }
+
+  // ── Start recording ───────────────────────────────────────────────────────
   async function startRecording() {
-    chunks = [];
-    recordedBlob = null;
+    chunks        = [];
+    recordedBlob  = null;
+    hasDownloaded = false;
     document.getElementById('preview-wrap').classList.remove('visible');
 
-    const noAudio  = document.getElementById('toggle-noaudio').classList.contains('active');
-    const useMic   = document.getElementById('toggle-mic').classList.contains('active');
-    const useSys   = document.getElementById('toggle-sys').classList.contains('active');
-    const quality  = document.getElementById('quality').value;
+    const noAudio = document.getElementById('toggle-noaudio').classList.contains('active');
+    const useMic  = document.getElementById('toggle-mic').classList.contains('active');
+    const useSys  = document.getElementById('toggle-sys').classList.contains('active');
+    const quality = document.getElementById('quality').value;
 
     try {
-      // Screen capture
-      const displayOpts = {
-        video: quality === '0' ? true : { height: { ideal: parseInt(quality) } },
-        audio: useSys,   // システム音声（対応ブラウザのみ）
+      // 1. Request screen capture
+      const vidConstraint = quality === '0' ? true : { height: { ideal: parseInt(quality, 10) } };
+      displayStream = await navigator.mediaDevices.getDisplayMedia({
+        video: vidConstraint,
+        audio: useSys && !noAudio,
         selfBrowserSurface: 'include',
-      };
-      displayStream = await navigator.mediaDevices.getDisplayMedia(displayOpts);
+      });
 
-      const tracks = [...displayStream.getTracks()];
-
-      // Mic
+      // 2. Request mic (separate call to allow independent permission)
+      micStream = null;
       if (!noAudio && useMic) {
         try {
           micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          micStream.getAudioTracks().forEach(t => tracks.push(t));
-        } catch(e) {
-          setStatus('マイクのアクセスが拒否されました。映像のみ録画します。', 'recording');
+        } catch (e) {
+          setStatus('マイクへのアクセスが拒否されました。映像のみ録画します。', 'recording');
         }
       }
 
-      combinedStream = new MediaStream(tracks);
+      // 3. Build combined stream with proper audio mixing
+      const videoTrack = displayStream.getVideoTracks()[0];
+      const tracks = [videoTrack];
 
-      // Choose codec
-      const mimeType = getSupportedMime();
-      const options  = mimeType ? { mimeType } : {};
-      mediaRecorder  = new MediaRecorder(combinedStream, options);
+      if (!noAudio) {
+        const audioStream = await buildAudioTrack(displayStream, micStream, useSys, useMic);
+        if (audioStream) {
+          audioStream.getAudioTracks().forEach(t => tracks.push(t));
+        }
+      }
 
-      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      const combined = new MediaStream(tracks);
+
+      // 4. Start MediaRecorder
+      const mime    = getSupportedMime();
+      const options = mime ? { mimeType: mime } : {};
+      mediaRecorder = new MediaRecorder(combined, options);
+      activeMimeType = mediaRecorder.mimeType || mime;
+
+      mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
       mediaRecorder.onstop = finalize;
 
-      // Stop if user closes the share dialog
-      displayStream.getVideoTracks()[0].onended = () => stopRecording();
+      // Stop when user closes the share picker
+      videoTrack.onended = () => stopRecording();
 
       mediaRecorder.start(500);
       isPaused = false;
@@ -498,94 +685,116 @@
       document.getElementById('btn-start').querySelector('.dot').classList.add('blink');
 
     } catch (err) {
-      console.error(err);
-      if (err.name === 'NotAllowedError') {
+      cleanupStreams();
+      if (err.name === 'NotAllowedError' || err.name === 'AbortError') {
         setStatus('画面共有がキャンセルされました。', 'idle');
       } else {
-        setStatus(`エラー: ${err.message}`, 'idle');
+        setStatus('エラー: ' + err.message, 'idle');
       }
+      resetButtons();
     }
   }
 
-  // ── Pause / Resume ─────────────────────────────────────────────
+  // ── Pause / Resume ────────────────────────────────────────────────────────
   function togglePause() {
     if (!mediaRecorder) return;
     const btn = document.getElementById('btn-pause');
     if (!isPaused) {
       mediaRecorder.pause();
       isPaused = true;
-      btn.textContent = '▶ 再開';
+      btn.innerHTML = '&#9654; 再開';
       setStatus('一時停止中', 'paused');
     } else {
       mediaRecorder.resume();
       isPaused = false;
-      btn.textContent = '⏸ 一時停止';
+      btn.innerHTML = '&#9208; 一時停止';
       setStatus('録画中...', 'recording');
     }
   }
 
-  // ── Stop ───────────────────────────────────────────────────────
+  // ── Stop ──────────────────────────────────────────────────────────────────
   function stopRecording() {
-    if (!mediaRecorder) return;
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
     mediaRecorder.stop();
-    combinedStream?.getTracks().forEach(t => t.stop());
-    micStream?.getTracks().forEach(t => t.stop());
+    cleanupStreams();
     stopTimer();
-
-    document.getElementById('btn-start').disabled = false;
-    document.getElementById('btn-pause').disabled = true;
-    document.getElementById('btn-stop').disabled  = true;
-    document.getElementById('btn-pause').textContent = '⏸ 一時停止';
-    document.getElementById('btn-start').querySelector('.dot').classList.remove('blink');
+    resetButtons();
     setStatus('処理中...', 'idle');
   }
 
-  // ── Finalize ───────────────────────────────────────────────────
-  function finalize() {
-    const mime = mediaRecorder?.mimeType || 'video/webm';
-    recordedBlob = new Blob(chunks, { type: mime });
-    const url  = URL.createObjectURL(recordedBlob);
-    const vid  = document.getElementById('preview');
-    vid.src    = url;
-
-    document.getElementById('preview-wrap').classList.add('visible');
-    setStatus(`録画完了 — ${formatBytes(recordedBlob.size)}`, 'ready');
+  function cleanupStreams() {
+    displayStream?.getTracks().forEach(t => t.stop());
+    micStream?.getTracks().forEach(t => t.stop());
+    audioCtx?.close().catch(() => {});
+    displayStream = null;
+    micStream     = null;
+    audioCtx      = null;
   }
 
-  // ── Download ───────────────────────────────────────────────────
+  function resetButtons() {
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-pause').disabled = true;
+    document.getElementById('btn-stop').disabled  = true;
+    document.getElementById('btn-pause').innerHTML = '&#9208; 一時停止';
+    document.getElementById('btn-start').querySelector('.dot').classList.remove('blink');
+  }
+
+  // ── Finalize ──────────────────────────────────────────────────────────────
+  function finalize() {
+    const mime    = activeMimeType || 'video/webm';
+    recordedBlob  = new Blob(chunks, { type: mime });
+    const url     = URL.createObjectURL(recordedBlob);
+    const ext     = getExt(mime).toUpperCase();
+    const preview = document.getElementById('preview');
+    preview.src   = url;
+
+    // Show format hint to guide users on how to open the file
+    const hints = {
+      webm: 'WebM 形式で保存されます。Chrome・Firefox・VLC で再生可能です。Windows Media Player や QuickTime では開けない場合があります。',
+      mp4:  'MP4 形式で保存されます。ほとんどのプレイヤーで再生可能です。',
+      ogg:  'OGG 形式で保存されます。VLC または Firefox で再生可能です。',
+    };
+    document.getElementById('format-hint').textContent = hints[ext.toLowerCase()] || '';
+    document.getElementById('preview-wrap').classList.add('visible');
+    setStatus('録画完了 — ' + formatBytes(recordedBlob.size) + ' (' + ext + ')', 'ready');
+  }
+
+  // ── Download ──────────────────────────────────────────────────────────────
   function downloadRecording() {
     if (!recordedBlob) return;
-    const name = document.getElementById('filename').value.trim() || 'fanbom-recording';
-    const ext  = getExt(recordedBlob.type);
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(recordedBlob);
-    a.download = `${name}.${ext}`;
+    const rawName = document.getElementById('filename').value;
+    const name    = sanitizeFilename(rawName);
+    const ext     = getExt(recordedBlob.type);
+    const url     = URL.createObjectURL(recordedBlob);
+    const a       = document.createElement('a');
+    a.href        = url;
+    a.download    = name + '.' + ext;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    hasDownloaded = true;
+    setStatus('保存しました: ' + name + '.' + ext, 'ready');
   }
 
-  // ── Helpers ────────────────────────────────────────────────────
-  function getSupportedMime() {
-    const candidates = [
-      'video/mp4;codecs=h264,aac',
-      'video/mp4',
-      'video/webm;codecs=vp9,opus',
-      'video/webm;codecs=vp8,opus',
-      'video/webm',
-    ];
-    return candidates.find(m => MediaRecorder.isTypeSupported(m)) || '';
-  }
+  // ── beforeunload guard ────────────────────────────────────────────────────
+  window.addEventListener('beforeunload', e => {
+    if (recordedBlob && !hasDownloaded) {
+      e.preventDefault();
+      e.returnValue = '録画データが未保存です。タブを閉じると録画データは失われます。';
+    }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      e.preventDefault();
+      e.returnValue = '録画中です。タブを閉じると録画が失われます。';
+    }
+  });
 
-  function getExt(mime) {
-    if (mime.includes('mp4'))  return 'mp4';
-    if (mime.includes('ogg'))  return 'ogg';
-    return 'webm';
-  }
-
+  // ── Helpers ───────────────────────────────────────────────────────────────
   function formatBytes(b) {
-    if (b < 1024)        return b + ' B';
-    if (b < 1024**2)     return (b/1024).toFixed(1) + ' KB';
-    if (b < 1024**3)     return (b/1024**2).toFixed(1) + ' MB';
-    return (b/1024**3).toFixed(2) + ' GB';
+    if (b < 1024)       return b + ' B';
+    if (b < 1048576)    return (b / 1024).toFixed(1) + ' KB';
+    if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+    return (b / 1073741824).toFixed(2) + ' GB';
   }
 </script>
 </body>
