@@ -1,20 +1,45 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src blob: data:;" />
-  <title>fanbom — シンプルな画面録画ツール</title>
-  <meta name="description" content="インストール不要のブラウザ画面録画ツール。録画データはサーバーに送信されません。" />
+
+  <title>Free Browser Screen Recorder — No Install, No Login | fanbom</title>
+  <meta name="description" content="Record your screen directly in your browser. No software to install, no account required, no video upload. 100% private and free. Works in Chrome, Edge, and Firefox." />
   <link rel="canonical" href="https://fanbom.online/" />
+
+  <link rel="alternate" hreflang="en"        href="https://fanbom.online/" />
+  <link rel="alternate" hreflang="ja"        href="https://fanbom.online/" />
+  <link rel="alternate" hreflang="zh-Hans"   href="https://fanbom.online/" />
+  <link rel="alternate" hreflang="zh-Hant"   href="https://fanbom.online/" />
+  <link rel="alternate" hreflang="es"        href="https://fanbom.online/" />
+  <link rel="alternate" hreflang="ko"        href="https://fanbom.online/" />
+  <link rel="alternate" hreflang="x-default" href="https://fanbom.online/" />
+
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://fanbom.online/" />
-  <meta property="og:title"       content="fanbom — Screen Recorder" />
-  <meta property="og:description" content="Simple browser-based screen recorder. No install needed. Data never leaves your browser." />
-  <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="fanbom — Screen Recorder" />
-  <meta name="twitter:description" content="Simple browser-based screen recorder. No install needed. Data never leaves your browser." />
+  <meta property="og:title"       content="fanbom — Free Private Screen Recorder" />
+  <meta property="og:description" content="Record your screen in your browser. No install, no login, no upload. 100% private, 100% free." />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="fanbom — Free Private Screen Recorder" />
+  <meta name="twitter:description" content="Record your screen in your browser. No install, no login, no upload." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "fanbom",
+    "url": "https://fanbom.online/",
+    "description": "Free browser-based screen recorder. No install, no login, no upload. Fully private — nothing leaves your browser.",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Chrome, Edge, Firefox",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["No installation required","No account required","No video upload","Privacy-first","Open source"]
+  }
+  </script>
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,14 +49,120 @@
       --red: #ef4444; --green: #22c55e; --yellow: #f59e0b;
       --text: #e2e8f0; --muted: #64748b; --r: 12px;
     }
+    html { scroll-behavior: smooth; }
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: var(--bg); color: var(--text);
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; padding: 32px 16px 48px;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
     }
 
-    /* ── Language selector ── */
+    /* ── Nav ── */
+    .site-nav {
+      align-self: stretch;
+      background: rgba(13,15,20,.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50; padding: 0 20px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; gap: 12px; height: 56px;
+    }
+    .nav-logo {
+      font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      flex-shrink: 0;
+    }
+    .nav-inner .lang-bar {
+      flex: 1; justify-content: flex-end; margin-bottom: 0; max-width: none; width: auto;
+    }
+    .btn-nav-cta {
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; text-decoration: none;
+      padding: 8px 14px; border-radius: 8px;
+      font-size: 0.8rem; font-weight: 700; white-space: nowrap;
+    }
+    @media (max-width: 540px) { .btn-nav-cta { display: none; } }
+
+    /* ── Hero ── */
+    .hero-section {
+      align-self: stretch; padding: 80px 20px 68px; text-align: center;
+      background: radial-gradient(ellipse at 50% -10%, rgba(92,110,248,.16) 0%, transparent 65%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-inner { max-width: 700px; margin: 0 auto; }
+    .hero-title {
+      font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 800;
+      line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 20px;
+    }
+    .hero-line2 { color: var(--muted); display: block; margin-top: 6px; }
+    .hero-sub {
+      font-size: 1rem; color: #94a3b8; line-height: 1.75;
+      max-width: 540px; margin: 0 auto 32px;
+    }
+    .btn-hero {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; text-decoration: none;
+      padding: 15px 32px; border-radius: 10px;
+      font-size: 1rem; font-weight: 700;
+      transition: opacity .15s, transform .1s;
+      margin-bottom: 14px; box-shadow: 0 4px 24px rgba(92,110,248,.4);
+    }
+    .btn-hero:hover { opacity: .9; transform: translateY(-1px); }
+    .hero-note { font-size: 0.8rem; color: var(--muted); }
+
+    /* ── Trust Bar ── */
+    .trust-bar {
+      align-self: stretch;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 32px;
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.83rem; color: #94a3b8; font-weight: 500;
+    }
+
+    /* ── Marketing sections ── */
+    .mkt-section { align-self: stretch; padding: 64px 20px; }
+    .mkt-alt { background: var(--surface); }
+    .mkt-inner { max-width: 900px; margin: 0 auto; }
+    .mkt-section h2 {
+      font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 800;
+      letter-spacing: -0.3px; margin-bottom: 36px; text-align: center;
+    }
+
+    /* ── Steps ── */
+    .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    @media (max-width: 660px) { .steps-grid { grid-template-columns: 1fr; } }
+    .step-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px;
+    }
+    .step-num {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-weight: 800; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+    }
+    .step-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .step-card p  { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Use Cases ── */
+    .cases-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+    @media (max-width: 560px) { .cases-grid { grid-template-columns: 1fr; } }
+    .case-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 20px 22px;
+    }
+    .case-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .case-card h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+    .case-card p  { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Lang bar ── */
     .lang-bar {
       width: 100%; max-width: 640px;
       display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
@@ -80,18 +211,17 @@
     }
     .btn-agree.ready { opacity: 1; }
 
-    /* ── Header ── */
-    header { text-align: center; margin-bottom: 28px; }
-    .logo {
-      font-size: 2.6rem; font-weight: 800; letter-spacing: -1px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    /* ── Tool section ── */
+    #tool { scroll-margin-top: 64px; }
+    .tool-wrap {
+      width: 100%; max-width: 640px;
+      padding: 48px 16px 32px;
+      display: flex; flex-direction: column; align-items: center;
     }
-    .tagline { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
 
     /* ── Notices ── */
     .notice {
-      width: 100%; max-width: 640px; border-radius: 8px; padding: 10px 14px;
+      width: 100%; border-radius: 8px; padding: 10px 14px;
       font-size: 0.82rem; display: flex; align-items: flex-start;
       gap: 8px; margin-bottom: 10px; line-height: 1.5;
     }
@@ -102,7 +232,7 @@
     /* ── Card ── */
     .card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 28px; width: 100%; max-width: 640px;
+      border-radius: var(--r); padding: 28px; width: 100%;
     }
     .section-label {
       font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
@@ -154,8 +284,7 @@
     .audio-warn {
       margin-bottom: 16px; padding: 10px 14px;
       background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2);
-      border-radius: 8px; font-size: 0.8rem; color: #fbbf24;
-      display: none; line-height: 1.55;
+      border-radius: 8px; font-size: 0.8rem; color: #fbbf24; display: none; line-height: 1.55;
     }
     .audio-warn.visible { display: block; }
 
@@ -202,6 +331,17 @@
     .btn-download { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.3); white-space: nowrap; }
     .format-hint { margin-top: 8px; font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
 
+    /* ── Share nudge ── */
+    .share-nudge {
+      margin-top: 10px; padding: 10px 14px;
+      background: rgba(92,110,248,.08); border: 1px solid rgba(92,110,248,.2);
+      border-radius: 8px; font-size: 0.8rem; color: #818cf8;
+      display: none; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+    .share-nudge.visible { display: flex; }
+    .share-nudge a { color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
+    .share-nudge a:hover { text-decoration: underline; }
+
     /* ── Status ── */
     .status-bar {
       margin-top: 16px; padding: 10px 14px; background: var(--surface);
@@ -213,9 +353,9 @@
     .status-dot.red    { background: var(--red); animation: blink 1s step-start infinite; }
     .status-dot.yellow { background: var(--yellow); }
 
-    /* ── Privacy card ── */
+    /* ── Privacy card (in tool wrap) ── */
     .privacy-card {
-      margin-top: 12px; width: 100%; max-width: 640px;
+      margin-top: 12px; width: 100%;
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--r); padding: 20px 24px;
     }
@@ -231,15 +371,59 @@
     .pi-value.good { color: var(--green); }
     .pi-value.warn { color: var(--yellow); }
 
-    footer { margin-top: 24px; color: var(--muted); font-size: 0.76rem; text-align: center; line-height: 2; }
-    footer a { color: var(--muted); }
+    /* ── Privacy hero section ── */
+    .privacy-hero { border-top: 1px solid var(--border); text-align: center; }
+    .privacy-hero h2 { margin-bottom: 16px; }
+    .privacy-hero-sub { font-size: 0.9rem; color: var(--muted); margin-bottom: 24px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .btn-ghost {
+      display: inline-block; color: var(--accent);
+      border: 1px solid var(--accent); border-radius: 8px;
+      padding: 10px 22px; text-decoration: none; font-size: 0.87rem; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-ghost:hover { background: rgba(92,110,248,.1); }
+
+    /* ── FAQ ── */
+    .faq-inner { max-width: 640px; margin: 0 auto; }
+    .faq-inner h2 { text-align: center; margin-bottom: 28px; font-size: clamp(1.3rem,3vw,1.9rem); font-weight: 800; letter-spacing: -0.3px; }
+    .faq-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); margin-bottom: 8px; overflow: hidden;
+    }
+    .faq-item summary {
+      padding: 16px 20px; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; color: var(--muted); font-size: 1.1rem; flex-shrink: 0; margin-left: 12px; }
+    .faq-item[open] > summary::after { content: '−'; }
+    .faq-answer { padding: 0 20px 16px; font-size: 0.86rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── Footer ── */
+    .site-footer {
+      align-self: stretch; margin-top: auto;
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 36px 20px; text-align: center;
+      color: var(--muted); font-size: 0.78rem; line-height: 2;
+    }
+    .footer-inner { max-width: 900px; margin: 0 auto; }
+    .footer-logo {
+      font-size: 1rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-right: 6px;
+    }
+    .footer-links { margin-top: 8px; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 20px; }
+    .footer-links a { color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
     .footer-disclaimer { cursor: pointer; text-decoration: underline; }
   </style>
 </head>
 <body>
 
 <!-- ══ DISCLAIMER MODAL ══════════════════════════════════════════ -->
-<div class="modal-backdrop" id="modal-backdrop">
+<div class="modal-backdrop hidden" id="modal-backdrop">
   <div class="modal" role="dialog" aria-modal="true">
     <h2 data-i18n="modalTitle"></h2>
     <p class="modal-sub" data-i18n="modalSub"></p>
@@ -268,157 +452,324 @@
   </div>
 </div>
 
-<!-- ══ LANGUAGE BAR ═══════════════════════════════════════════════ -->
-<div class="lang-bar" id="lang-bar">
-  <button class="lang-btn" onclick="changeLang('ja')"    data-lang="ja">日本語</button>
-  <button class="lang-btn" onclick="changeLang('en')"    data-lang="en">English</button>
-  <button class="lang-btn" onclick="changeLang('zh-CN')" data-lang="zh-CN">简体中文</button>
-  <button class="lang-btn" onclick="changeLang('zh-TW')" data-lang="zh-TW">繁體中文</button>
-  <button class="lang-btn" onclick="changeLang('es')"    data-lang="es">Español</button>
-  <button class="lang-btn" onclick="changeLang('ko')"    data-lang="ko">한국어</button>
+<!-- ══ NAV ════════════════════════════════════════════════════════ -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <span class="nav-logo">fanbom</span>
+    <div class="lang-bar" id="lang-bar">
+      <button class="lang-btn" onclick="changeLang('ja')"    data-lang="ja">日本語</button>
+      <button class="lang-btn" onclick="changeLang('en')"    data-lang="en">English</button>
+      <button class="lang-btn" onclick="changeLang('zh-CN')" data-lang="zh-CN">简体中文</button>
+      <button class="lang-btn" onclick="changeLang('zh-TW')" data-lang="zh-TW">繁體中文</button>
+      <button class="lang-btn" onclick="changeLang('es')"    data-lang="es">Español</button>
+      <button class="lang-btn" onclick="changeLang('ko')"    data-lang="ko">한국어</button>
+    </div>
+    <a href="#tool" class="btn-nav-cta" data-i18n="navCta"></a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      <span data-i18n="heroLine1"></span>
+      <span class="hero-line2" data-i18n="heroLine2"></span>
+    </h1>
+    <p class="hero-sub" data-i18n="heroSub"></p>
+    <a href="#tool" class="btn-hero" data-i18n="heroCta"></a>
+    <p class="hero-note" data-i18n="heroNote"></p>
+  </div>
+</section>
+
+<!-- ══ TRUST BAR ═════════════════════════════════════════════════ -->
+<div class="trust-bar">
+  <div class="trust-item">🔒 <span data-i18n="trustUpload"></span></div>
+  <div class="trust-item">🚫 <span data-i18n="trustAccount"></span></div>
+  <div class="trust-item">⚡ <span data-i18n="trustInstant"></span></div>
+  <div class="trust-item">🌐 <span data-i18n="trustOpen"></span></div>
 </div>
 
-<!-- ══ HEADER ═════════════════════════════════════════════════════ -->
-<header>
-  <div class="logo">fanbom</div>
-  <p class="tagline" data-i18n="tagline"></p>
-</header>
-
-<!-- Notices -->
-<div class="notice yellow">
-  <span class="notice-icon">&#9888;</span>
-  <p data-i18n="noticeStorage"></p>
-</div>
-<div class="notice blue" id="https-notice" style="display:none">
-  <span class="notice-icon">&#8505;</span>
-  <p data-i18n="noticeHttps"></p>
-</div>
-
-<!-- ══ MAIN CARD ══════════════════════════════════════════════════ -->
-<div class="card">
-
-  <p class="section-label" data-i18n="sectionAudio"></p>
-  <div class="toggle-group">
-
-    <div class="toggle-row active" id="toggle-mic" role="checkbox" aria-checked="true"
-         tabindex="0" onclick="toggleMicSys(this)" onkeydown="keyToggle(event,this)">
-      <div class="toggle-info">
-        <span class="toggle-icon">&#127897;</span>
-        <div class="toggle-text">
-          <strong data-i18n="micLabel"></strong>
-          <small data-i18n="micDesc"></small>
-        </div>
+<!-- ══ HOW IT WORKS ══════════════════════════════════════════════ -->
+<section class="mkt-section">
+  <div class="mkt-inner">
+    <h2 data-i18n="howTitle"></h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3 data-i18n="step1Title"></h3>
+        <p data-i18n="step1Desc"></p>
       </div>
-      <div class="pill"></div>
-    </div>
-
-    <div class="toggle-row" id="toggle-sys" role="checkbox" aria-checked="false"
-         tabindex="0" onclick="toggleMicSys(this)" onkeydown="keyToggle(event,this)">
-      <div class="toggle-info">
-        <span class="toggle-icon">&#128266;</span>
-        <div class="toggle-text">
-          <strong data-i18n="sysLabel"></strong>
-          <small data-i18n="sysDesc"></small>
-        </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3 data-i18n="step2Title"></h3>
+        <p data-i18n="step2Desc"></p>
       </div>
-      <div class="pill"></div>
-    </div>
-
-    <div class="toggle-row" id="toggle-noaudio" role="checkbox" aria-checked="false"
-         tabindex="0" onclick="toggleNoAudio()" onkeydown="keyToggle(event,this)">
-      <div class="toggle-info">
-        <span class="toggle-icon">&#128263;</span>
-        <div class="toggle-text">
-          <strong data-i18n="noAudioLabel"></strong>
-          <small data-i18n="noAudioDesc"></small>
-        </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3 data-i18n="step3Title"></h3>
+        <p data-i18n="step3Desc"></p>
       </div>
-      <div class="pill"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ USE CASES ══════════════════════════════════════════════════ -->
+<section class="mkt-section mkt-alt">
+  <div class="mkt-inner">
+    <h2 data-i18n="useCasesTitle"></h2>
+    <div class="cases-grid">
+      <div class="case-card">
+        <div class="case-icon">🐛</div>
+        <h3 data-i18n="uc1Title"></h3>
+        <p data-i18n="uc1Desc"></p>
+      </div>
+      <div class="case-card">
+        <div class="case-icon">🎓</div>
+        <h3 data-i18n="uc2Title"></h3>
+        <p data-i18n="uc2Desc"></p>
+      </div>
+      <div class="case-card">
+        <div class="case-icon">💻</div>
+        <h3 data-i18n="uc3Title"></h3>
+        <p data-i18n="uc3Desc"></p>
+      </div>
+      <div class="case-card">
+        <div class="case-icon">🔐</div>
+        <h3 data-i18n="uc4Title"></h3>
+        <p data-i18n="uc4Desc"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TOOL ═══════════════════════════════════════════════════════ -->
+<div id="tool" class="tool-wrap">
+
+  <div class="notice yellow" id="notice-storage" style="display:none">
+    <span class="notice-icon">&#9888;</span>
+    <p data-i18n="noticeStorage"></p>
+  </div>
+  <div class="notice blue" id="https-notice" style="display:none">
+    <span class="notice-icon">&#8505;</span>
+    <p data-i18n="noticeHttps"></p>
+  </div>
+
+  <div class="card">
+    <p class="section-label" data-i18n="sectionAudio"></p>
+    <div class="toggle-group">
+      <div class="toggle-row active" id="toggle-mic" role="checkbox" aria-checked="true"
+           tabindex="0" onclick="toggleMicSys(this)" onkeydown="keyToggle(event,this)">
+        <div class="toggle-info">
+          <span class="toggle-icon">&#127897;</span>
+          <div class="toggle-text">
+            <strong data-i18n="micLabel"></strong>
+            <small data-i18n="micDesc"></small>
+          </div>
+        </div>
+        <div class="pill"></div>
+      </div>
+      <div class="toggle-row" id="toggle-sys" role="checkbox" aria-checked="false"
+           tabindex="0" onclick="toggleMicSys(this)" onkeydown="keyToggle(event,this)">
+        <div class="toggle-info">
+          <span class="toggle-icon">&#128266;</span>
+          <div class="toggle-text">
+            <strong data-i18n="sysLabel"></strong>
+            <small data-i18n="sysDesc"></small>
+          </div>
+        </div>
+        <div class="pill"></div>
+      </div>
+      <div class="toggle-row" id="toggle-noaudio" role="checkbox" aria-checked="false"
+           tabindex="0" onclick="toggleNoAudio()" onkeydown="keyToggle(event,this)">
+        <div class="toggle-info">
+          <span class="toggle-icon">&#128263;</span>
+          <div class="toggle-text">
+            <strong data-i18n="noAudioLabel"></strong>
+            <small data-i18n="noAudioDesc"></small>
+          </div>
+        </div>
+        <div class="pill"></div>
+      </div>
     </div>
 
-  </div>
+    <div class="audio-warn" id="audio-warn" data-i18n="audioWarnText"></div>
 
-  <div class="audio-warn" id="audio-warn" data-i18n="audioWarnText"></div>
-
-  <p class="section-label" data-i18n="sectionQuality"></p>
-  <div class="quality-row">
-    <select id="quality" aria-label="Quality">
-      <option value="1080" data-i18n="q1080"></option>
-      <option value="720"  data-i18n="q720"  selected></option>
-      <option value="480"  data-i18n="q480"></option>
-      <option value="0"    data-i18n="q0"></option>
-    </select>
-    <div class="format-badge" id="format-badge">WebM</div>
-  </div>
-
-  <div class="timer" id="timer" aria-live="polite">00:00:00</div>
-
-  <div class="controls">
-    <button class="btn btn-primary" id="btn-start" onclick="startRecording()">
-      <span class="dot"></span>
-      <span data-i18n="btnStart"></span>
-    </button>
-    <button class="btn btn-warn" id="btn-pause" onclick="togglePause()" disabled>
-      <span id="pause-label" data-i18n="btnPause"></span>
-    </button>
-    <button class="btn btn-danger" id="btn-stop" onclick="stopRecording()" disabled>
-      <span data-i18n="btnStop"></span>
-    </button>
-  </div>
-
-  <div class="preview-wrap" id="preview-wrap">
-    <p class="preview-label" data-i18n="previewLabel"></p>
-    <video id="preview" controls></video>
-    <div class="download-row">
-      <input type="text" id="filename" maxlength="100" data-i18n-placeholder="filenamePlaceholder" value="fanbom-recording" />
-      <button class="btn btn-download" onclick="downloadRecording()" data-i18n="btnDownload"></button>
+    <p class="section-label" data-i18n="sectionQuality"></p>
+    <div class="quality-row">
+      <select id="quality" aria-label="Quality">
+        <option value="1080" data-i18n="q1080"></option>
+        <option value="720"  data-i18n="q720" selected></option>
+        <option value="480"  data-i18n="q480"></option>
+        <option value="0"    data-i18n="q0"></option>
+      </select>
+      <div class="format-badge" id="format-badge">WebM</div>
     </div>
-    <p class="format-hint" id="format-hint"></p>
+
+    <div class="timer" id="timer" aria-live="polite">00:00:00</div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="btn-start" onclick="startRecording()">
+        <span class="dot"></span>
+        <span data-i18n="btnStart"></span>
+      </button>
+      <button class="btn btn-warn" id="btn-pause" onclick="togglePause()" disabled>
+        <span id="pause-label" data-i18n="btnPause"></span>
+      </button>
+      <button class="btn btn-danger" id="btn-stop" onclick="stopRecording()" disabled>
+        <span data-i18n="btnStop"></span>
+      </button>
+    </div>
+
+    <div class="preview-wrap" id="preview-wrap">
+      <p class="preview-label" data-i18n="previewLabel"></p>
+      <video id="preview" controls></video>
+      <div class="download-row">
+        <input type="text" id="filename" maxlength="100" data-i18n-placeholder="filenamePlaceholder" value="fanbom-recording" />
+        <button class="btn btn-download" onclick="downloadRecording()" data-i18n="btnDownload"></button>
+      </div>
+      <p class="format-hint" id="format-hint"></p>
+      <div class="share-nudge" id="share-nudge">
+        <span data-i18n="shareNudgeText"></span>
+        <a href="https://twitter.com/intent/tweet?text=Just+used+fanbom+to+record+my+screen+%E2%80%94+no+install%2C+no+login%2C+nothing+uploaded.+https%3A%2F%2Ffanbom.online" target="_blank" rel="noopener" data-i18n="shareNudgeBtn"></a>
+      </div>
+    </div>
+
+    <div class="status-bar" role="status" aria-live="polite">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text" data-i18n="statusIdle"></span>
+    </div>
   </div>
 
-  <div class="status-bar" role="status" aria-live="polite">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-text" data-i18n="statusIdle"></span>
+  <div class="privacy-card">
+    <h3 data-i18n="privacyTitle"></h3>
+    <div class="privacy-grid">
+      <div class="privacy-item">
+        <div class="pi-label" data-i18n="piServerLabel"></div>
+        <div class="pi-value good" data-i18n="piServerValue"></div>
+      </div>
+      <div class="privacy-item">
+        <div class="pi-label" data-i18n="piStorageLabel"></div>
+        <div class="pi-value warn" data-i18n="piStorageValue"></div>
+      </div>
+      <div class="privacy-item">
+        <div class="pi-label" data-i18n="piTrackingLabel"></div>
+        <div class="pi-value good" data-i18n="piTrackingValue"></div>
+      </div>
+      <div class="privacy-item">
+        <div class="pi-label" data-i18n="piExternalLabel"></div>
+        <div class="pi-value good" data-i18n="piExternalValue"></div>
+      </div>
+    </div>
   </div>
 
 </div>
 
-<!-- ══ PRIVACY CARD ═══════════════════════════════════════════════ -->
-<div class="privacy-card">
-  <h3 data-i18n="privacyTitle"></h3>
-  <div class="privacy-grid">
-    <div class="privacy-item">
-      <div class="pi-label" data-i18n="piServerLabel"></div>
-      <div class="pi-value good" data-i18n="piServerValue"></div>
-    </div>
-    <div class="privacy-item">
-      <div class="pi-label" data-i18n="piStorageLabel"></div>
-      <div class="pi-value warn" data-i18n="piStorageValue"></div>
-    </div>
-    <div class="privacy-item">
-      <div class="pi-label" data-i18n="piTrackingLabel"></div>
-      <div class="pi-value good" data-i18n="piTrackingValue"></div>
-    </div>
-    <div class="privacy-item">
-      <div class="pi-label" data-i18n="piExternalLabel"></div>
-      <div class="pi-value good" data-i18n="piExternalValue"></div>
+<!-- ══ PRIVACY STATEMENT ══════════════════════════════════════════ -->
+<section class="mkt-section privacy-hero">
+  <div class="mkt-inner">
+    <h2 data-i18n="privacyHeroTitle"></h2>
+    <p class="privacy-hero-sub" data-i18n="privacyHeroSub"></p>
+    <a href="https://github.com/niweizheng-1/fanbom" target="_blank" rel="noopener" class="btn-ghost" data-i18n="viewOnGitHub"></a>
+  </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════════ -->
+<section class="mkt-section">
+  <div class="faq-inner">
+    <h2 data-i18n="faqTitle"></h2>
+    <details class="faq-item">
+      <summary data-i18n="faq1Q"></summary>
+      <p class="faq-answer" data-i18n="faq1A"></p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq2Q"></summary>
+      <p class="faq-answer" data-i18n="faq2A"></p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq3Q"></summary>
+      <p class="faq-answer" data-i18n="faq3A"></p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq4Q"></summary>
+      <p class="faq-answer" data-i18n="faq4A"></p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq5Q"></summary>
+      <p class="faq-answer" data-i18n="faq5A"></p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq6Q"></summary>
+      <p class="faq-answer" data-i18n="faq6A"></p>
+    </details>
+  </div>
+</section>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div><span class="footer-logo">fanbom</span><span data-i18n="footerTagline"></span></div>
+    <p data-i18n="footerNote"></p>
+    <div class="footer-links">
+      <a href="https://fanbom.online/">fanbom.online</a>
+      <a href="https://github.com/niweizheng-1/fanbom" target="_blank" rel="noopener">GitHub</a>
+      <span>MIT License</span>
+      <span class="footer-disclaimer" onclick="reopenDisclaimer()" data-i18n="footerDisclaimer"></span>
     </div>
   </div>
-</div>
-
-<footer>
-  fanbom v1.2 &nbsp;&mdash;&nbsp;
-  <a href="https://fanbom.online/" target="_blank" rel="noopener">fanbom.online</a>
-  &nbsp;&mdash;&nbsp;
-  <a href="https://github.com/niweizheng-1/fanbom" target="_blank" rel="noopener">GitHub</a>
-  &nbsp;&mdash;&nbsp; MIT License &nbsp;&mdash;&nbsp;
-  <span class="footer-disclaimer" onclick="reopenDisclaimer()" data-i18n="footerDisclaimer"></span>
 </footer>
 
 <script>
-// ══ TRANSLATIONS ════════════════════════════════════════════════════════════
+// ══ TRANSLATIONS ══════════════════════════════════════════════════════════════
 const LANGS = {
   ja: {
+    pageTitle: 'fanbom — インストール不要の無料ブラウザ画面録画ツール',
+    metaDesc: 'インストール不要のブラウザ画面録画ツール。アカウント不要、データアップロードなし。Chrome・Edge・Firefox対応。',
+    navCta: '▶ 録画を開始',
+    heroLine1: '画面を録画する。',
+    heroLine2: 'インストール不要。ログイン不要。アップロード不要。',
+    heroSub: 'fanbom はすべての処理をブラウザ内で完結します。録画データはサーバーに送信されず、外部に共有されることもありません。開いて、録画して、保存するだけ。',
+    heroCta: '▶ 録画を開始する（無料）',
+    heroNote: 'Chrome・Edge・Firefox対応 · アカウント不要 · オープンソース',
+    trustUpload: 'データ送信なし',
+    trustAccount: 'アカウント不要',
+    trustInstant: 'すぐに使える',
+    trustOpen: 'オープンソース (MIT)',
+    howTitle: '使い方',
+    step1Title: 'fanbom.online を開く',
+    step1Desc: 'ダウンロード不要。どのブラウザでも動作します。',
+    step2Title: '録画対象を選ぶ',
+    step2Desc: '画面全体・特定のウィンドウ・タブを選択。マイク・システム音声も任意で追加。',
+    step3Title: '録画して保存',
+    step3Desc: 'プレビューで確認後、ファイルをダウンロード。タブを閉じれば何も残りません。',
+    useCasesTitle: '誰が使っている？',
+    uc1Title: 'バグ報告',
+    uc1Desc: 'チケットに文字で書くより早く、何が起きたかをそのまま見せよう。',
+    uc2Title: 'クイックチュートリアル',
+    uc2Desc: 'OBSの設定もLoomの課金も不要。素早く画面解説を録画。',
+    uc3Title: '面接練習',
+    uc3Desc: 'コーディング練習やポートフォリオの録画をプライベートに。クラウドには何も送られません。',
+    uc4Title: '機密性の高い録画',
+    uc4Desc: '銀行画面や社外秘コンテンツも安心。ファイルはサーバーに触れません。',
+    privacyHeroTitle: '録画はあなたのブラウザの外に出ません。',
+    privacyHeroSub: 'fanbom はオープンソースです。言葉を信じなくてもOK — コードを読んでください。',
+    viewOnGitHub: 'GitHub で確認する →',
+    faqTitle: 'よくある質問',
+    faq1Q: 'fanbom は無料ですか？',
+    faq1A: 'はい。プランも透かしも試用制限も一切ありません。MITライセンスの完全無料ツールです。',
+    faq2Q: 'インストールは必要ですか？',
+    faq2A: '不要です。ブラウザだけで動作します。拡張機能もダウンロードも不要。',
+    faq3Q: '録画データはどこに保存されますか？',
+    faq3A: 'どこにも送信されません。ダウンロードするかタブを閉じるまで、ブラウザのメモリにのみ存在します。タブを閉じると完全に削除されます。',
+    faq4Q: 'Macでも使えますか？',
+    faq4A: '使えます。マイク録音は全プラットフォーム対応。システム音声はChromeのみ、macOSでは取得できません。',
+    faq5Q: 'Loomとどう違うの？',
+    faq5A: 'Loomはアカウント登録が必要で、動画をサーバーにアップロードします。fanbomは何も必要とせず、何も保存しません。',
+    faq6Q: '録画時間の制限はありますか？',
+    faq6A: '制限はありません。ブラウザのメモリが許す限り録画できます。',
+    footerTagline: '無料のプライベート画面録画ツール',
+    footerNote: 'インストール不要 · ログイン不要 · アップロード不要',
+    shareNudgeText: 'fanbom が役に立ちましたか？',
+    shareNudgeBtn: 'Xでシェアする →',
     tagline: 'シンプルなブラウザ画面録画ツール',
     noticeStorage: '録画はブラウザのメモリに一時保存されます。タブを閉じる前に必ず「保存」してください。閉じると録画データは消えます。',
     noticeHttps: '画面録画には HTTPS または localhost が必要です。このページは HTTP で開かれているため録画できない場合があります。',
@@ -433,7 +784,7 @@ const LANGS = {
     previewLabel: '録画プレビュー', filenamePlaceholder: 'ファイル名（拡張子なし）', btnDownload: '保存',
     statusIdle: '「録画開始」を押してください',
     statusRecording: '録画中...', statusPaused: '一時停止中', statusProcessing: '処理中...',
-    statusCancelled: '画面共有がキャンセルされました。',
+    statusCancelled: '画面共有がキャンセルされました。もう一度「録画開始」を押してください。',
     statusMicDenied: 'マイクへのアクセスが拒否されました。映像のみ録画します。',
     statusDone: '録画完了',
     statusSaved: '保存しました',
@@ -456,11 +807,59 @@ const LANGS = {
     modalLimitTitle: 'ブラウザ制限について',
     modalLimitText: '本ツールは Web API（getDisplayMedia / MediaRecorder）を使用しています。システム音声は Chrome のみ対応で macOS では取得できない場合があります。録画は WebM 形式で保存されます（VLC・Chrome・Firefox で再生可能）。',
     modalCheckText: '上記の内容を読み、理解した上で同意します。',
-    modalAgreeBtn: '同意して使用する',
+    modalAgreeBtn: '同意して録画を開始',
     unloadRecording: '録画データが未保存です。タブを閉じると失われます。',
     unloadActive: '録画中です。タブを閉じると録画が失われます。',
   },
   en: {
+    pageTitle: 'Free Browser Screen Recorder — No Install, No Login | fanbom',
+    metaDesc: 'Record your screen directly in your browser. No software to install, no account required, no video upload. 100% private and free.',
+    navCta: '▶ Start Recording',
+    heroLine1: 'Record your screen.',
+    heroLine2: 'No install. No login. No upload.',
+    heroSub: 'fanbom captures your screen entirely inside your browser — nothing is uploaded, stored, or tracked. Just open, record, and save.',
+    heroCta: '▶ Start Recording — Free',
+    heroNote: 'Works in Chrome, Edge, Firefox · No signup · Open source',
+    trustUpload: 'Zero data upload',
+    trustAccount: 'No account needed',
+    trustInstant: 'Works instantly',
+    trustOpen: 'Open source (MIT)',
+    howTitle: 'How it works',
+    step1Title: 'Open fanbom.online',
+    step1Desc: 'Nothing to download. Works in any modern browser.',
+    step2Title: 'Choose your source',
+    step2Desc: 'Full screen, a window, or a browser tab. Add mic or system audio — or record silent.',
+    step3Title: 'Record and save',
+    step3Desc: 'Preview your recording, name the file, download. Close the tab — nothing remains.',
+    useCasesTitle: 'Who uses fanbom?',
+    uc1Title: 'Bug reports & walkthroughs',
+    uc1Desc: 'Show your team exactly what happened — faster than writing a ticket.',
+    uc2Title: 'Quick tutorial videos',
+    uc2Desc: 'Record a lesson or demo without setting up OBS or paying for Loom.',
+    uc3Title: 'Interview practice',
+    uc3Desc: 'Record your coding walkthrough or portfolio demo privately — nothing goes to the cloud.',
+    uc4Title: 'Sensitive recordings',
+    uc4Desc: 'Recording something confidential? No server ever touches your file.',
+    privacyHeroTitle: 'Your recording never leaves your browser.',
+    privacyHeroSub: 'fanbom is open source. Don\'t take our word for it — read the code yourself.',
+    viewOnGitHub: 'View on GitHub →',
+    faqTitle: 'Frequently asked questions',
+    faq1Q: 'Is fanbom free?',
+    faq1A: 'Yes. No plans, no watermarks, no trial limits. Free and open source under MIT license.',
+    faq2Q: 'Do I need to install anything?',
+    faq2A: 'No. It runs entirely in your browser. No extension, no download required.',
+    faq3Q: 'Where does my recording go?',
+    faq3A: 'Nowhere. It stays in your browser memory until you download it or close the tab. Closing the tab deletes it permanently.',
+    faq4Q: 'Does it work on Mac?',
+    faq4A: 'Yes. Mic audio works on all platforms. System audio capture is Chrome-only and not available on macOS.',
+    faq5Q: 'How is this different from Loom?',
+    faq5A: 'Loom requires a signup and uploads your video to their servers. fanbom requires nothing and stores nothing.',
+    faq6Q: 'Is there a recording length limit?',
+    faq6A: 'No hard limit. Recording length depends only on available browser memory.',
+    footerTagline: 'Free private screen recorder',
+    footerNote: 'No install · No login · No upload',
+    shareNudgeText: 'Found fanbom useful?',
+    shareNudgeBtn: 'Share on X →',
     tagline: 'Simple browser-based screen recorder',
     noticeStorage: 'Recordings are stored in browser memory only. Save before closing the tab — data will be permanently lost.',
     noticeHttps: 'Screen recording requires HTTPS or localhost. This page is served over HTTP and may not record correctly.',
@@ -475,11 +874,11 @@ const LANGS = {
     previewLabel: 'Recording Preview', filenamePlaceholder: 'Filename (no extension)', btnDownload: 'Save',
     statusIdle: 'Press "Start Recording" to begin',
     statusRecording: 'Recording...', statusPaused: 'Paused', statusProcessing: 'Processing...',
-    statusCancelled: 'Screen share was cancelled.',
+    statusCancelled: 'Screen share cancelled. Click "Start Recording" to try again.',
     statusMicDenied: 'Microphone access denied. Recording video only.',
     statusDone: 'Recording complete',
     statusSaved: 'Saved',
-    fmtWebm: 'Saved as WebM. Playable in VLC, Chrome, and Firefox. May not open in Windows Media Player or QuickTime.',
+    fmtWebm: 'Saved as WebM · plays in Chrome, Firefox, VLC. Need MP4? Your browser may support it automatically.',
     fmtMp4: 'Saved as MP4. Playable in most media players.',
     fmtOgg: 'Saved as OGG. Playable in VLC or Firefox.',
     privacyTitle: 'Data & Privacy',
@@ -498,11 +897,59 @@ const LANGS = {
     modalLimitTitle: 'Browser Limitations',
     modalLimitText: 'This tool uses Web APIs (getDisplayMedia / MediaRecorder). System audio capture is Chrome-only and unavailable on macOS. Recordings are saved in WebM format (playable in VLC, Chrome, and Firefox).',
     modalCheckText: 'I have read and understood the above, and I agree.',
-    modalAgreeBtn: 'Agree & Continue',
+    modalAgreeBtn: 'Agree & Start Recording',
     unloadRecording: 'Unsaved recording will be permanently lost if you close this tab.',
     unloadActive: 'Recording in progress. Closing the tab will lose the recording.',
   },
   'zh-CN': {
+    pageTitle: 'fanbom — 免费浏览器录屏工具，无需安装登录',
+    metaDesc: '直接在浏览器中录制屏幕。无需安装软件，无需账户，不上传视频。100%私密免费。',
+    navCta: '▶ 开始录制',
+    heroLine1: '录制屏幕。',
+    heroLine2: '无需安装。无需登录。不上传数据。',
+    heroSub: 'fanbom 完全在浏览器内处理。录制内容不会上传到任何服务器，不被追踪，不被存储。打开即用，录完即走。',
+    heroCta: '▶ 开始录制（免费）',
+    heroNote: '支持 Chrome、Edge、Firefox · 无需注册 · 开源',
+    trustUpload: '零数据上传',
+    trustAccount: '无需账户',
+    trustInstant: '即开即用',
+    trustOpen: '开源 (MIT)',
+    howTitle: '使用方法',
+    step1Title: '打开 fanbom.online',
+    step1Desc: '无需下载，任意现代浏览器均可使用。',
+    step2Title: '选择录制来源',
+    step2Desc: '全屏、特定窗口或浏览器标签页，可选麦克风或系统音频。',
+    step3Title: '录制并保存',
+    step3Desc: '预览确认后下载文件。关闭标签页，什么都不留下。',
+    useCasesTitle: '谁在使用 fanbom？',
+    uc1Title: 'Bug 报告',
+    uc1Desc: '直接录下来给同事看，比写工单快多了。',
+    uc2Title: '快速教程',
+    uc2Desc: '不用配置 OBS，不用付 Loom 的钱，快速录制演示。',
+    uc3Title: '面试练习',
+    uc3Desc: '私密录制代码练习或作品集演示，不上传任何内容。',
+    uc4Title: '敏感内容录制',
+    uc4Desc: '录制机密内容也放心，文件不会经过任何服务器。',
+    privacyHeroTitle: '录制内容永远不会离开您的浏览器。',
+    privacyHeroSub: 'fanbom 是开源项目。不用相信我们的话——直接看代码。',
+    viewOnGitHub: '在 GitHub 上查看 →',
+    faqTitle: '常见问题',
+    faq1Q: 'fanbom 是免费的吗？',
+    faq1A: '是的。没有付费计划，没有水印，没有试用限制。MIT 许可证完全免费开源。',
+    faq2Q: '需要安装任何东西吗？',
+    faq2A: '不需要。完全在浏览器中运行，无需扩展，无需下载。',
+    faq3Q: '录制内容存储在哪里？',
+    faq3A: '不会发送到任何地方。在您下载或关闭标签页之前，仅存在于浏览器内存中。关闭标签页后永久删除。',
+    faq4Q: 'Mac 上可以使用吗？',
+    faq4A: '可以。麦克风录音支持所有平台。系统音频仅 Chrome 支持，macOS 上不可用。',
+    faq5Q: 'fanbom 和 Loom 有什么区别？',
+    faq5A: 'Loom 需要注册账户，会将视频上传到服务器。fanbom 不需要任何东西，也不存储任何内容。',
+    faq6Q: '录制时长有限制吗？',
+    faq6A: '没有硬性限制，录制时长取决于可用的浏览器内存。',
+    footerTagline: '免费的私密屏幕录制工具',
+    footerNote: '无需安装 · 无需登录 · 不上传数据',
+    shareNudgeText: 'fanbom 对您有帮助吗？',
+    shareNudgeBtn: '分享到 X →',
     tagline: '简单的浏览器屏幕录制工具',
     noticeStorage: '录制内容仅保存在浏览器内存中。关闭标签页前请务必保存，否则将永久丢失。',
     noticeHttps: '屏幕录制需要 HTTPS 或 localhost。当前页面通过 HTTP 访问，可能无法正常录制。',
@@ -517,7 +964,7 @@ const LANGS = {
     previewLabel: '录制预览', filenamePlaceholder: '文件名（不含扩展名）', btnDownload: '保存',
     statusIdle: '点击「开始录制」以开始',
     statusRecording: '录制中...', statusPaused: '已暂停', statusProcessing: '处理中...',
-    statusCancelled: '屏幕共享已取消。',
+    statusCancelled: '屏幕共享已取消。点击「开始录制」重试。',
     statusMicDenied: '麦克风访问被拒绝，仅录制视频。',
     statusDone: '录制完成',
     statusSaved: '已保存',
@@ -540,11 +987,52 @@ const LANGS = {
     modalLimitTitle: '浏览器限制',
     modalLimitText: '本工具使用 Web API（getDisplayMedia / MediaRecorder）。系统音频仅 Chrome 支持，macOS 上不可用。录制文件以 WebM 格式保存（可在 VLC、Chrome 和 Firefox 中播放）。',
     modalCheckText: '我已阅读并理解上述内容，同意继续使用。',
-    modalAgreeBtn: '同意并继续',
+    modalAgreeBtn: '同意并开始录制',
     unloadRecording: '未保存的录制内容将在关闭标签页后永久丢失。',
     unloadActive: '正在录制中，关闭标签页将丢失录制内容。',
   },
   'zh-TW': {
+    pageTitle: 'fanbom — 免費瀏覽器錄製工具，無需安裝登入',
+    metaDesc: '直接在瀏覽器中錄製螢幕。無需安裝，無需帳號，不上傳影片。100%私密免費。',
+    navCta: '▶ 開始錄製',
+    heroLine1: '錄製螢幕。',
+    heroLine2: '無需安裝。無需登入。不上傳資料。',
+    heroSub: 'fanbom 完全在瀏覽器內處理。錄製內容不會上傳到任何伺服器，不被追蹤，不被儲存。打開即用，錄完即走。',
+    heroCta: '▶ 開始錄製（免費）',
+    heroNote: '支援 Chrome、Edge、Firefox · 無需註冊 · 開源',
+    trustUpload: '零資料上傳',
+    trustAccount: '無需帳號',
+    trustInstant: '即開即用',
+    trustOpen: '開源 (MIT)',
+    howTitle: '使用方法',
+    step1Title: '開啟 fanbom.online',
+    step1Desc: '無需下載，任何現代瀏覽器均可使用。',
+    step2Title: '選擇錄製來源',
+    step2Desc: '全螢幕、特定視窗或瀏覽器分頁，可選麥克風或系統音訊。',
+    step3Title: '錄製並儲存',
+    step3Desc: '預覽確認後下載檔案。關閉分頁，什麼都不留下。',
+    useCasesTitle: '誰在使用 fanbom？',
+    uc1Title: 'Bug 回報',
+    uc1Desc: '直接錄下來給同事看，比寫工單快多了。',
+    uc2Title: '快速教學',
+    uc2Desc: '不用設定 OBS，不用付 Loom 的費用，快速錄製示範。',
+    uc3Title: '面試練習',
+    uc3Desc: '私密錄製程式練習或作品集示範，不上傳任何內容。',
+    uc4Title: '敏感內容錄製',
+    uc4Desc: '錄製機密內容也放心，檔案不會經過任何伺服器。',
+    privacyHeroTitle: '錄製內容永遠不會離開您的瀏覽器。',
+    privacyHeroSub: 'fanbom 是開源專案。不用相信我們的話——直接看程式碼。',
+    viewOnGitHub: '在 GitHub 上查看 →',
+    faqTitle: '常見問題',
+    faq1Q: 'fanbom 是免費的嗎？', faq1A: '是的。沒有付費方案，沒有浮水印，沒有試用限制。MIT 授權完全免費開源。',
+    faq2Q: '需要安裝任何東西嗎？', faq2A: '不需要。完全在瀏覽器中執行，無需擴充功能，無需下載。',
+    faq3Q: '錄製內容儲存在哪裡？', faq3A: '不會傳送到任何地方。在您下載或關閉分頁之前，僅存在於瀏覽器記憶體中。關閉分頁後永久刪除。',
+    faq4Q: 'Mac 上可以使用嗎？', faq4A: '可以。麥克風錄音支援所有平台。系統音訊僅 Chrome 支援，macOS 上不可用。',
+    faq5Q: 'fanbom 和 Loom 有什麼差別？', faq5A: 'Loom 需要註冊帳號，會將影片上傳到伺服器。fanbom 不需要任何東西，也不儲存任何內容。',
+    faq6Q: '錄製時長有限制嗎？', faq6A: '沒有硬性限制，錄製時長取決於可用的瀏覽器記憶體。',
+    footerTagline: '免費的私密螢幕錄製工具',
+    footerNote: '無需安裝 · 無需登入 · 不上傳資料',
+    shareNudgeText: 'fanbom 對您有幫助嗎？', shareNudgeBtn: '分享到 X →',
     tagline: '簡單的瀏覽器螢幕錄製工具',
     noticeStorage: '錄製內容僅儲存在瀏覽器記憶體中。關閉分頁前請務必儲存，否則將永久遺失。',
     noticeHttps: '螢幕錄製需要 HTTPS 或 localhost。目前頁面透過 HTTP 存取，可能無法正常錄製。',
@@ -559,11 +1047,10 @@ const LANGS = {
     previewLabel: '錄製預覽', filenamePlaceholder: '檔案名稱（不含副檔名）', btnDownload: '儲存',
     statusIdle: '點擊「開始錄製」以開始',
     statusRecording: '錄製中...', statusPaused: '已暫停', statusProcessing: '處理中...',
-    statusCancelled: '螢幕共享已取消。',
+    statusCancelled: '螢幕共享已取消。點擊「開始錄製」重試。',
     statusMicDenied: '麥克風存取被拒絕，僅錄製影片。',
-    statusDone: '錄製完成',
-    statusSaved: '已儲存',
-    fmtWebm: '以 WebM 格式儲存。可在 VLC、Chrome、Firefox 中播放。Windows Media Player 和 QuickTime 可能無法開啟。',
+    statusDone: '錄製完成', statusSaved: '已儲存',
+    fmtWebm: '以 WebM 格式儲存。可在 VLC、Chrome、Firefox 中播放。',
     fmtMp4: '以 MP4 格式儲存。大多數播放器均可播放。',
     fmtOgg: '以 OGG 格式儲存。可在 VLC 或 Firefox 中播放。',
     privacyTitle: '資料與隱私',
@@ -574,38 +1061,78 @@ const LANGS = {
     footerDisclaimer: '查看免責聲明',
     modalTitle: '使用前須知', modalSub: '請閱讀以下內容後再繼續使用。',
     modalPrivacyTitle: '隱私說明',
-    modalPrivacyText: 'fanbom 的所有處理均在瀏覽器內完成。錄製資料不會上傳到任何伺服器，也不會與外部共享。錄製內容僅儲存在瀏覽器記憶體（RAM）中，關閉分頁後將被清除。',
+    modalPrivacyText: 'fanbom 的所有處理均在瀏覽器內完成。錄製資料不會上傳到任何伺服器。錄製內容僅儲存在瀏覽器記憶體（RAM）中，關閉分頁後將被清除。',
     modalDisclaimerTitle: '免責聲明',
-    modalDisclaimerText: '使用本工具需自行承擔風險。開發者對使用本工具產生的錄製內容、目的或對第三方的影響概不負責。',
+    modalDisclaimerText: '使用本工具需自行承擔風險。開發者對錄製內容、目的或對第三方的影響概不負責。',
     modalLegalTitle: '錄製相關法律',
-    modalLegalText: '錄製第三方影片或音訊可能受當地法律約束。使用前請確保遵守適用法律並已取得所有必要同意。未經同意錄製可能違法。',
+    modalLegalText: '錄製第三方影片或音訊可能受當地法律約束。使用前請確保遵守適用法律並已取得所有必要同意。',
     modalLimitTitle: '瀏覽器限制',
-    modalLimitText: '本工具使用 Web API（getDisplayMedia / MediaRecorder）。系統音訊僅 Chrome 支援，macOS 上不可用。錄製檔案以 WebM 格式儲存（可在 VLC、Chrome 和 Firefox 中播放）。',
+    modalLimitText: '本工具使用 Web API（getDisplayMedia / MediaRecorder）。系統音訊僅 Chrome 支援，macOS 上不可用。錄製檔案以 WebM 格式儲存。',
     modalCheckText: '我已閱讀並理解上述內容，同意繼續使用。',
-    modalAgreeBtn: '同意並繼續',
+    modalAgreeBtn: '同意並開始錄製',
     unloadRecording: '未儲存的錄製內容將在關閉分頁後永久遺失。',
     unloadActive: '正在錄製中，關閉分頁將遺失錄製內容。',
   },
   es: {
+    pageTitle: 'fanbom — Grabador de Pantalla Gratuito en el Navegador, Sin Instalar',
+    metaDesc: 'Graba tu pantalla directamente en el navegador. Sin instalar, sin cuenta, sin subir vídeos. 100% privado y gratuito.',
+    navCta: '▶ Grabar ahora',
+    heroLine1: 'Graba tu pantalla.',
+    heroLine2: 'Sin instalar. Sin cuenta. Sin subir datos.',
+    heroSub: 'fanbom procesa todo dentro de tu navegador — nada se sube, almacena ni rastrea. Abre la página, graba y guarda.',
+    heroCta: '▶ Grabar ahora — Gratis',
+    heroNote: 'Funciona en Chrome, Edge, Firefox · Sin registro · Código abierto',
+    trustUpload: 'Sin subida de datos',
+    trustAccount: 'Sin cuenta',
+    trustInstant: 'Funciona al instante',
+    trustOpen: 'Código abierto (MIT)',
+    howTitle: 'Cómo funciona',
+    step1Title: 'Abre fanbom.online',
+    step1Desc: 'Nada que descargar. Funciona en cualquier navegador moderno.',
+    step2Title: 'Elige tu fuente',
+    step2Desc: 'Pantalla completa, una ventana o pestaña. Añade micrófono o audio del sistema.',
+    step3Title: 'Graba y guarda',
+    step3Desc: 'Previsualiza tu grabación, nómbrala y descárgala. Cierra la pestaña — no queda nada.',
+    useCasesTitle: '¿Quién usa fanbom?',
+    uc1Title: 'Reportes de errores',
+    uc1Desc: 'Muestra a tu equipo exactamente qué pasó — más rápido que escribir un ticket.',
+    uc2Title: 'Tutoriales rápidos',
+    uc2Desc: 'Graba una lección sin configurar OBS ni pagar por Loom.',
+    uc3Title: 'Práctica de entrevistas',
+    uc3Desc: 'Graba tu práctica de código de forma privada — nada va a la nube.',
+    uc4Title: 'Grabaciones sensibles',
+    uc4Desc: '¿Grabando algo confidencial? Ningún servidor toca tu archivo.',
+    privacyHeroTitle: 'Tu grabación nunca sale de tu navegador.',
+    privacyHeroSub: 'fanbom es código abierto. No tienes que creer en nuestra palabra — lee el código.',
+    viewOnGitHub: 'Ver en GitHub →',
+    faqTitle: 'Preguntas frecuentes',
+    faq1Q: '¿Es fanbom gratis?', faq1A: 'Sí. Sin planes de pago, sin marcas de agua, sin límites de prueba. Gratis y de código abierto bajo licencia MIT.',
+    faq2Q: '¿Necesito instalar algo?', faq2A: 'No. Funciona completamente en tu navegador. Sin extensión, sin descarga.',
+    faq3Q: '¿Dónde va mi grabación?', faq3A: 'A ningún lado. Permanece en la memoria del navegador hasta que la descargues o cierres la pestaña.',
+    faq4Q: '¿Funciona en Mac?', faq4A: 'Sí. El audio del micrófono funciona en todas las plataformas. El audio del sistema es solo para Chrome y no está disponible en macOS.',
+    faq5Q: '¿En qué se diferencia de Loom?', faq5A: 'Loom requiere registro y sube tu vídeo a sus servidores. fanbom no requiere nada y no almacena nada.',
+    faq6Q: '¿Hay límite de duración?', faq6A: 'No hay límite fijo. Depende de la memoria disponible en tu navegador.',
+    footerTagline: 'Grabador de pantalla privado y gratuito',
+    footerNote: 'Sin instalar · Sin cuenta · Sin subir datos',
+    shareNudgeText: '¿Te fue útil fanbom?', shareNudgeBtn: 'Compartir en X →',
     tagline: 'Grabador de pantalla simple basado en navegador',
-    noticeStorage: 'Las grabaciones se almacenan solo en la memoria del navegador. Guarda antes de cerrar la pestaña, de lo contrario se perderá permanentemente.',
-    noticeHttps: 'La grabación de pantalla requiere HTTPS o localhost. Esta página usa HTTP y puede no funcionar correctamente.',
+    noticeStorage: 'Las grabaciones se almacenan solo en la memoria del navegador. Guarda antes de cerrar la pestaña.',
+    noticeHttps: 'La grabación de pantalla requiere HTTPS o localhost. Esta página usa HTTP y puede no funcionar.',
     sectionAudio: 'Configuración de Audio',
     micLabel: 'Micrófono', micDesc: 'Grabar audio del micrófono',
-    sysLabel: 'Audio del Sistema', sysDesc: 'Solo Chrome / Marcar "Compartir audio" en el diálogo de pantalla',
+    sysLabel: 'Audio del Sistema', sysDesc: 'Solo Chrome / Marcar "Compartir audio" en el diálogo',
     noAudioLabel: 'Sin Audio', noAudioDesc: 'Grabar solo video',
-    audioWarnText: 'Audio del sistema: Solo Chrome. Marca "Compartir audio" en el diálogo de pantalla. No disponible en macOS. Se mezcla automáticamente con el micrófono si ambos están activos.',
+    audioWarnText: 'Audio del sistema: Solo Chrome. Marca "Compartir audio" en el diálogo. No disponible en macOS.',
     sectionQuality: 'Calidad y Formato',
     q1080: 'Full HD (1080p)', q720: 'HD (720p)', q480: 'SD (480p)', q0: 'Mantener resolución original',
     btnStart: 'Iniciar Grabación', btnPause: 'Pausar', btnResume: 'Reanudar', btnStop: 'Detener',
     previewLabel: 'Vista Previa', filenamePlaceholder: 'Nombre del archivo (sin extensión)', btnDownload: 'Guardar',
     statusIdle: 'Presiona "Iniciar Grabación" para comenzar',
     statusRecording: 'Grabando...', statusPaused: 'En pausa', statusProcessing: 'Procesando...',
-    statusCancelled: 'Compartir pantalla fue cancelado.',
+    statusCancelled: 'Compartir pantalla cancelado. Haz clic en "Iniciar Grabación" para intentar de nuevo.',
     statusMicDenied: 'Acceso al micrófono denegado. Grabando solo video.',
-    statusDone: 'Grabación completada',
-    statusSaved: 'Guardado',
-    fmtWebm: 'Guardado como WebM. Reproducible en VLC, Chrome y Firefox. Puede no abrirse en Windows Media Player o QuickTime.',
+    statusDone: 'Grabación completada', statusSaved: 'Guardado',
+    fmtWebm: 'Guardado como WebM. Reproducible en VLC, Chrome y Firefox.',
     fmtMp4: 'Guardado como MP4. Reproducible en la mayoría de reproductores.',
     fmtOgg: 'Guardado como OGG. Reproducible en VLC o Firefox.',
     privacyTitle: 'Datos y Privacidad',
@@ -616,38 +1143,78 @@ const LANGS = {
     footerDisclaimer: 'Ver Aviso Legal',
     modalTitle: 'Antes de Usar fanbom', modalSub: 'Por favor, lee lo siguiente antes de continuar.',
     modalPrivacyTitle: 'Privacidad',
-    modalPrivacyText: 'fanbom procesa todo dentro de tu navegador. Ningún dato se envía a servidores externos. Las grabaciones se almacenan solo en la memoria RAM y se eliminan al cerrar la pestaña.',
+    modalPrivacyText: 'fanbom procesa todo dentro de tu navegador. Ningún dato se envía a servidores externos.',
     modalDisclaimerTitle: 'Aviso Legal',
-    modalDisclaimerText: 'Usa esta herramienta bajo tu propia responsabilidad. El desarrollador no acepta ninguna responsabilidad por el contenido, propósito o impacto de las grabaciones.',
+    modalDisclaimerText: 'Usa esta herramienta bajo tu propia responsabilidad.',
     modalLegalTitle: 'Leyes de Grabación',
-    modalLegalText: 'Grabar a terceros puede estar sujeto a leyes locales. Asegúrate de cumplir con las leyes aplicables y obtener los consentimientos necesarios. Grabar sin consentimiento puede ser ilegal.',
+    modalLegalText: 'Grabar a terceros puede estar sujeto a leyes locales. Asegúrate de obtener los consentimientos necesarios.',
     modalLimitTitle: 'Limitaciones del Navegador',
-    modalLimitText: 'Esta herramienta usa APIs Web (getDisplayMedia / MediaRecorder). El audio del sistema solo está disponible en Chrome y no en macOS. Las grabaciones se guardan en formato WebM (reproducible en VLC, Chrome y Firefox).',
+    modalLimitText: 'Esta herramienta usa APIs Web. El audio del sistema solo está disponible en Chrome y no en macOS.',
     modalCheckText: 'He leído y entendido lo anterior, y estoy de acuerdo.',
-    modalAgreeBtn: 'Aceptar y Continuar',
+    modalAgreeBtn: 'Aceptar e Iniciar Grabación',
     unloadRecording: 'La grabación no guardada se perderá al cerrar esta pestaña.',
     unloadActive: 'Grabación en curso. Cerrar la pestaña perderá la grabación.',
   },
   ko: {
+    pageTitle: 'fanbom — 설치 없는 무료 브라우저 화면 녹화',
+    metaDesc: '브라우저에서 바로 화면을 녹화하세요. 설치 불필요, 계정 불필요, 업로드 없음. 100% 무료.',
+    navCta: '▶ 녹화 시작',
+    heroLine1: '화면을 녹화하세요.',
+    heroLine2: '설치 불필요. 로그인 불필요. 업로드 불필요.',
+    heroSub: 'fanbom은 모든 처리를 브라우저 내에서 완결합니다. 녹화 데이터는 어떤 서버에도 전송되지 않으며 추적되지 않습니다.',
+    heroCta: '▶ 무료로 녹화 시작',
+    heroNote: 'Chrome, Edge, Firefox 지원 · 가입 불필요 · 오픈소스',
+    trustUpload: '데이터 업로드 없음',
+    trustAccount: '계정 불필요',
+    trustInstant: '즉시 사용 가능',
+    trustOpen: '오픈소스 (MIT)',
+    howTitle: '사용 방법',
+    step1Title: 'fanbom.online 열기',
+    step1Desc: '다운로드 없음. 모든 최신 브라우저에서 작동합니다.',
+    step2Title: '녹화 대상 선택',
+    step2Desc: '전체 화면, 특정 창 또는 브라우저 탭. 마이크나 시스템 오디오 추가 가능.',
+    step3Title: '녹화하고 저장',
+    step3Desc: '녹화를 미리보고 파일을 다운로드하세요. 탭을 닫으면 아무것도 남지 않습니다.',
+    useCasesTitle: '누가 fanbom을 사용하나요?',
+    uc1Title: '버그 리포트',
+    uc1Desc: '티켓에 글로 쓰는 것보다 빠르게 팀원에게 무슨 일이 있었는지 보여주세요.',
+    uc2Title: '빠른 튜토리얼',
+    uc2Desc: 'OBS 설정이나 Loom 결제 없이 빠르게 화면 해설을 녹화하세요.',
+    uc3Title: '면접 연습',
+    uc3Desc: '코딩 연습이나 포트폴리오 녹화를 비공개로 — 클라우드에는 아무것도 가지 않습니다.',
+    uc4Title: '민감한 녹화',
+    uc4Desc: '기밀 내용을 녹화해도 안심. 어떤 서버도 파일에 접근하지 않습니다.',
+    privacyHeroTitle: '녹화 내용은 절대 브라우저를 벗어나지 않습니다.',
+    privacyHeroSub: 'fanbom은 오픈소스입니다. 우리 말을 믿지 않아도 됩니다 — 코드를 직접 읽어보세요.',
+    viewOnGitHub: 'GitHub에서 확인하기 →',
+    faqTitle: '자주 묻는 질문',
+    faq1Q: 'fanbom은 무료인가요?', faq1A: '네. 유료 플랜, 워터마크, 체험판 제한이 없습니다. MIT 라이선스로 완전 무료 오픈소스입니다.',
+    faq2Q: '설치가 필요한가요?', faq2A: '아니요. 브라우저에서 완전히 실행됩니다. 확장 프로그램이나 다운로드가 필요 없습니다.',
+    faq3Q: '녹화 내용은 어디에 저장되나요?', faq3A: '아무 곳에도 전송되지 않습니다. 다운로드하거나 탭을 닫을 때까지 브라우저 메모리에만 존재합니다.',
+    faq4Q: 'Mac에서도 사용할 수 있나요?', faq4A: '네. 마이크 녹음은 모든 플랫폼에서 작동합니다. 시스템 오디오는 Chrome 전용이며 macOS에서는 불가합니다.',
+    faq5Q: 'Loom과 어떻게 다른가요?', faq5A: 'Loom은 회원가입이 필요하고 영상을 서버에 업로드합니다. fanbom은 아무것도 필요 없고 아무것도 저장하지 않습니다.',
+    faq6Q: '녹화 시간 제한이 있나요?', faq6A: '제한 없습니다. 사용 가능한 브라우저 메모리에 따라 달라집니다.',
+    footerTagline: '무료 프라이빗 화면 녹화 도구',
+    footerNote: '설치 불필요 · 로그인 불필요 · 업로드 없음',
+    shareNudgeText: 'fanbom이 도움이 되셨나요?', shareNudgeBtn: 'X에서 공유하기 →',
     tagline: '간단한 브라우저 화면 녹화 도구',
-    noticeStorage: '녹화 내용은 브라우저 메모리에만 저장됩니다. 탭을 닫기 전에 반드시 저장하세요. 닫으면 영구적으로 삭제됩니다.',
-    noticeHttps: '화면 녹화에는 HTTPS 또는 localhost가 필요합니다. 현재 HTTP로 제공되어 녹화가 작동하지 않을 수 있습니다.',
+    noticeStorage: '녹화 내용은 브라우저 메모리에만 저장됩니다. 탭을 닫기 전에 반드시 저장하세요.',
+    noticeHttps: '화면 녹화에는 HTTPS 또는 localhost가 필요합니다.',
     sectionAudio: '오디오 설정',
     micLabel: '마이크', micDesc: '마이크 오디오 녹음',
     sysLabel: '시스템 오디오', sysDesc: 'Chrome 전용 / 화면 공유 대화상자에서 「오디오 공유」 체크 필요',
     noAudioLabel: '오디오 없음', noAudioDesc: '비디오만 녹화',
-    audioWarnText: '시스템 오디오: Chrome 전용. 화면 공유 대화상자에서 「오디오 공유」를 체크하세요. macOS는 OS 제한으로 불가. 마이크와 함께 사용 시 자동 믹싱됩니다.',
+    audioWarnText: '시스템 오디오: Chrome 전용. 공유 대화상자에서 「오디오 공유」를 체크하세요. macOS 불가.',
     sectionQuality: '화질 및 형식',
     q1080: '풀HD (1080p)', q720: 'HD (720p)', q480: 'SD (480p)', q0: '원본 해상도 유지',
     btnStart: '녹화 시작', btnPause: '일시정지', btnResume: '재개', btnStop: '정지',
     previewLabel: '녹화 미리보기', filenamePlaceholder: '파일 이름 (확장자 제외)', btnDownload: '저장',
     statusIdle: '「녹화 시작」을 눌러 시작하세요',
     statusRecording: '녹화 중...', statusPaused: '일시정지됨', statusProcessing: '처리 중...',
-    statusCancelled: '화면 공유가 취소되었습니다.',
+    statusCancelled: '화면 공유가 취소되었습니다. 「녹화 시작」을 다시 클릭하세요.',
     statusMicDenied: '마이크 접근이 거부되었습니다. 비디오만 녹화합니다.',
-    statusDone: '녹화 완료',
-    statusSaved: '저장되었습니다',
-    fmtWebm: 'WebM 형식으로 저장됩니다. VLC, Chrome, Firefox에서 재생 가능합니다. Windows Media Player나 QuickTime에서는 열리지 않을 수 있습니다.',
+    statusDone: '녹화 완료', statusSaved: '저장되었습니다',
+    fmtWebm: 'WebM 형식으로 저장됩니다. VLC, Chrome, Firefox에서 재생 가능합니다.',
     fmtMp4: 'MP4 형식으로 저장됩니다. 대부분의 플레이어에서 재생 가능합니다.',
     fmtOgg: 'OGG 형식으로 저장됩니다. VLC 또는 Firefox에서 재생 가능합니다.',
     privacyTitle: '데이터 및 개인정보',
@@ -658,21 +1225,21 @@ const LANGS = {
     footerDisclaimer: '면책 조항 확인',
     modalTitle: 'fanbom 사용 전 안내', modalSub: '계속하기 전에 다음 내용을 읽어주세요.',
     modalPrivacyTitle: '개인정보 보호',
-    modalPrivacyText: 'fanbom의 모든 처리는 브라우저 내에서 완결됩니다. 녹화 데이터는 어떤 서버에도 전송되지 않습니다. 녹화는 브라우저 메모리(RAM)에만 저장되며 탭을 닫으면 삭제됩니다.',
+    modalPrivacyText: 'fanbom의 모든 처리는 브라우저 내에서 완결됩니다. 녹화 데이터는 어떤 서버에도 전송되지 않습니다.',
     modalDisclaimerTitle: '면책 조항',
-    modalDisclaimerText: '이 도구는 본인 책임 하에 사용하세요. 개발자는 녹화 내용, 목적 또는 제3자에 대한 영향에 대해 어떠한 책임도 지지 않습니다.',
+    modalDisclaimerText: '이 도구는 본인 책임 하에 사용하세요.',
     modalLegalTitle: '녹화 관련 법률',
-    modalLegalText: '제3자를 녹화하는 행위는 해당 지역 법률의 적용을 받을 수 있습니다. 적용 법률을 준수하고 필요한 동의를 받은 후 사용하세요. 동의 없는 녹화는 불법일 수 있습니다.',
+    modalLegalText: '제3자를 녹화하는 행위는 해당 지역 법률의 적용을 받을 수 있습니다.',
     modalLimitTitle: '브라우저 제한',
-    modalLimitText: '이 도구는 Web API(getDisplayMedia / MediaRecorder)를 사용합니다. 시스템 오디오는 Chrome 전용이며 macOS에서는 불가합니다. 녹화 파일은 WebM 형식으로 저장됩니다(VLC, Chrome, Firefox에서 재생 가능).',
+    modalLimitText: '시스템 오디오는 Chrome 전용이며 macOS에서는 불가합니다.',
     modalCheckText: '위 내용을 읽고 이해했으며 동의합니다.',
-    modalAgreeBtn: '동의하고 계속하기',
+    modalAgreeBtn: '동의하고 녹화 시작',
     unloadRecording: '저장되지 않은 녹화는 탭을 닫으면 영구적으로 삭제됩니다.',
     unloadActive: '녹화 진행 중입니다. 탭을 닫으면 녹화가 손실됩니다.',
   },
 };
 
-// ══ I18N ENGINE ══════════════════════════════════════════════════════════════
+// ══ I18N ENGINE ═══════════════════════════════════════════════════════════════
 let currentLang = localStorage.getItem('fanbom_lang') || detectLang();
 
 function detectLang() {
@@ -696,7 +1263,9 @@ function applyLang(lang) {
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
   });
-  document.title = 'fanbom — ' + t('tagline');
+  document.title = t('pageTitle');
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute('content', t('metaDesc'));
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
@@ -704,28 +1273,23 @@ function applyLang(lang) {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
-
-  // Quality select options
   document.querySelectorAll('#quality option[data-i18n]').forEach(opt => {
     opt.textContent = t(opt.dataset.i18n);
   });
 
-  // Pause button (might be in resumed state)
   if (isPaused) {
     document.getElementById('pause-label').textContent = t('btnResume');
   }
-
-  // Restore idle status if not recording
   if (!mediaRecorder || mediaRecorder.state === 'inactive') {
     document.getElementById('status-text').textContent = t('statusIdle');
   }
 }
 
-function changeLang(lang) {
-  applyLang(lang);
-}
+function changeLang(lang) { applyLang(lang); }
 
-// ══ DISCLAIMER ════════════════════════════════════════════════════════════════
+// ══ DISCLAIMER ═══════════════════════════════════════════════════════════════
+let pendingStart = false;
+
 function onAgreeChange() {
   const ok = document.getElementById('agree-check').checked;
   const btn = document.getElementById('btn-agree');
@@ -736,6 +1300,7 @@ function acceptDisclaimer() {
   if (!document.getElementById('agree-check').checked) return;
   localStorage.setItem('fanbom_agreed', '1');
   document.getElementById('modal-backdrop').classList.add('hidden');
+  if (pendingStart) { pendingStart = false; startRecording(); }
 }
 function reopenDisclaimer() {
   document.getElementById('agree-check').checked = false;
@@ -743,33 +1308,23 @@ function reopenDisclaimer() {
   document.getElementById('modal-backdrop').classList.remove('hidden');
 }
 
-// ══ RECORDING STATE ═══════════════════════════════════════════════════════════
+// ══ RECORDING STATE ════════════════════════════════════════════════════════════
 let mediaRecorder = null, chunks = [], timerInterval = null, seconds = 0;
 let isPaused = false, recordedBlob = null, hasDownloaded = false;
 let displayStream = null, micStream = null, audioCtx = null;
 let activeMimeType = '';
 
-// ══ INIT ══════════════════════════════════════════════════════════════════════
+// ══ INIT ═══════════════════════════════════════════════════════════════════════
 (function init() {
   applyLang(currentLang);
 
-  // Show disclaimer if not agreed
-  if (localStorage.getItem('fanbom_agreed') !== '1') {
-    document.getElementById('modal-backdrop').classList.remove('hidden');
-  } else {
-    document.getElementById('modal-backdrop').classList.add('hidden');
-  }
-
-  // HTTPS check
   if (location.protocol !== 'https:' && !['localhost','127.0.0.1'].includes(location.hostname)) {
     document.getElementById('https-notice').style.display = 'flex';
   }
 
-  // Format badge
   const mime = getSupportedMime();
   activeMimeType = mime;
-  const ext = getExt(mime).toUpperCase();
-  document.getElementById('format-badge').textContent = ext;
+  document.getElementById('format-badge').textContent = getExt(mime).toUpperCase();
 })();
 
 // ══ TOGGLE HELPERS ════════════════════════════════════════════════════════════
@@ -802,7 +1357,7 @@ function keyToggle(e, el) {
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); el.click(); }
 }
 
-// ══ TIMER ═════════════════════════════════════════════════════════════════════
+// ══ TIMER ══════════════════════════════════════════════════════════════════════
 function startTimer() {
   seconds = 0;
   const el = document.getElementById('timer');
@@ -820,7 +1375,7 @@ function stopTimer() {
   document.getElementById('timer').classList.remove('recording');
 }
 
-// ══ STATUS ════════════════════════════════════════════════════════════════════
+// ══ STATUS ═════════════════════════════════════════════════════════════════════
 function setStatus(key, state = 'idle', extra = '') {
   const dot = document.getElementById('status-dot');
   dot.className = 'status-dot';
@@ -830,7 +1385,7 @@ function setStatus(key, state = 'idle', extra = '') {
   document.getElementById('status-text').textContent = t(key) + (extra ? ' — ' + extra : '');
 }
 
-// ══ AUDIO MIXING (AudioContext) ═══════════════════════════════════════════════
+// ══ AUDIO MIXING ══════════════════════════════════════════════════════════════
 async function buildAudioTrack(dispStr, micStr, useSys, useMic) {
   const hasSys = useSys && dispStr.getAudioTracks().length > 0;
   const hasMic = useMic && micStr && micStr.getAudioTracks().length > 0;
@@ -844,10 +1399,18 @@ async function buildAudioTrack(dispStr, micStr, useSys, useMic) {
   return dest.stream;
 }
 
-// ══ START ════════════════════════════════════════════════════════════════════
+// ══ START ══════════════════════════════════════════════════════════════════════
 async function startRecording() {
+  if (localStorage.getItem('fanbom_agreed') !== '1') {
+    pendingStart = true;
+    document.getElementById('modal-backdrop').classList.remove('hidden');
+    return;
+  }
+
   chunks = []; recordedBlob = null; hasDownloaded = false;
   document.getElementById('preview-wrap').classList.remove('visible');
+  document.getElementById('share-nudge').classList.remove('visible');
+  document.getElementById('notice-storage').style.display = 'none';
 
   const noAudio = document.getElementById('toggle-noaudio').classList.contains('active');
   const useMic  = document.getElementById('toggle-mic').classList.contains('active');
@@ -872,7 +1435,7 @@ async function startRecording() {
     const tracks = [displayStream.getVideoTracks()[0]];
     if (!noAudio) {
       const audioStream = await buildAudioTrack(displayStream, micStream, useSys, useMic);
-      if (audioStream) audioStream.getAudioTracks().forEach(t => tracks.push(t));
+      if (audioStream) audioStream.getAudioTracks().forEach(tr => tracks.push(tr));
     }
 
     const mime = getSupportedMime();
@@ -890,18 +1453,20 @@ async function startRecording() {
     document.getElementById('btn-pause').disabled = false;
     document.getElementById('btn-stop').disabled  = false;
     document.getElementById('btn-start').querySelector('.dot').classList.add('blink');
+    document.getElementById('notice-storage').style.display = 'flex';
     startTimer();
     setStatus('statusRecording', 'recording');
 
   } catch (err) {
     cleanupStreams();
     resetButtons();
+    document.getElementById('notice-storage').style.display = 'none';
     setStatus(err.name === 'NotAllowedError' || err.name === 'AbortError'
       ? 'statusCancelled' : 'statusIdle', 'idle');
   }
 }
 
-// ══ PAUSE / RESUME ════════════════════════════════════════════════════════════
+// ══ PAUSE / RESUME ═════════════════════════════════════════════════════════════
 function togglePause() {
   if (!mediaRecorder) return;
   if (!isPaused) {
@@ -915,7 +1480,7 @@ function togglePause() {
   }
 }
 
-// ══ STOP ══════════════════════════════════════════════════════════════════════
+// ══ STOP ═══════════════════════════════════════════════════════════════════════
 function stopRecording() {
   if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
   mediaRecorder.stop();
@@ -926,8 +1491,8 @@ function stopRecording() {
 }
 
 function cleanupStreams() {
-  displayStream?.getTracks().forEach(t => t.stop());
-  micStream?.getTracks().forEach(t => t.stop());
+  displayStream?.getTracks().forEach(tr => tr.stop());
+  micStream?.getTracks().forEach(tr => tr.stop());
   audioCtx?.close().catch(() => {});
   displayStream = micStream = audioCtx = null;
 }
@@ -939,7 +1504,7 @@ function resetButtons() {
   document.getElementById('btn-start').querySelector('.dot').classList.remove('blink');
 }
 
-// ══ FINALIZE ══════════════════════════════════════════════════════════════════
+// ══ FINALIZE ═══════════════════════════════════════════════════════════════════
 function finalize() {
   const mime = activeMimeType || 'video/webm';
   recordedBlob = new Blob(chunks, { type: mime });
@@ -951,7 +1516,7 @@ function finalize() {
   setStatus('statusDone', 'ready', formatBytes(recordedBlob.size) + ' · ' + ext.toUpperCase());
 }
 
-// ══ DOWNLOAD ══════════════════════════════════════════════════════════════════
+// ══ DOWNLOAD ════════════════════════════════════════════════════════════════════
 function downloadRecording() {
   if (!recordedBlob) return;
   const name = sanitize(document.getElementById('filename').value) || 'fanbom-recording';
@@ -961,10 +1526,12 @@ function downloadRecording() {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
   hasDownloaded = true;
+  document.getElementById('notice-storage').style.display = 'none';
+  document.getElementById('share-nudge').classList.add('visible');
   setStatus('statusSaved', 'ready', name + '.' + ext);
 }
 
-// ══ BEFORE UNLOAD ═════════════════════════════════════════════════════════════
+// ══ BEFORE UNLOAD ═══════════════════════════════════════════════════════════════
 window.addEventListener('beforeunload', e => {
   const msg = recordedBlob && !hasDownloaded ? t('unloadRecording')
             : (mediaRecorder && mediaRecorder.state !== 'inactive') ? t('unloadActive')
@@ -972,7 +1539,7 @@ window.addEventListener('beforeunload', e => {
   if (msg) { e.preventDefault(); e.returnValue = msg; }
 });
 
-// ══ HELPERS ═══════════════════════════════════════════════════════════════════
+// ══ HELPERS ════════════════════════════════════════════════════════════════════
 function getSupportedMime() {
   return ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm',
           'video/mp4;codecs=h264,aac','video/mp4']
